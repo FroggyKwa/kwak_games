@@ -8,7 +8,6 @@ running = True
 fps = 60
 sockOut = connect_OutSocket()
 sockIn = connect_InSocket(port=5556)
-print(read_sock(sockIn))
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

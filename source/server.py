@@ -7,6 +7,7 @@ sockIn = connect_InSocket()
 
 while True:
     data = read_sock(sockIn)
+    pass
 
 close_sock(sockIn)
 close_sock(sockOut)
