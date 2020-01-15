@@ -1,5 +1,6 @@
 import pygame
 
+
 JUMP_POWER = 10
 GRAVITY = 0.35
 MOVE_SPEED = 7

@@ -1,13 +1,12 @@
-import socket
+from source.web import connect_InSocket, connect_OutSocket, read_sock, sock_send, close_sock
 
-UDP_PORT = 5555
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('', UDP_PORT))
+
+sockOut = connect_OutSocket(port=5556)
+sockIn = connect_InSocket()
+
 
 while True:
-    data = sock.recv(1024)
-    if not data:
-        break
-    print(data.decode())
+    data = read_sock(sockIn)
 
-sock.close()
+close_sock(sockIn)
+close_sock(sockOut)
