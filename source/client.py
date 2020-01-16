@@ -1,73 +1,76 @@
-import json
-import threading
 import pygame
 from source.web import *
+pygame.init()
+size = width, height = 1280, 800
+screen = pygame.display.set_mode(size)
+running = True
+FPS = 60
+cl = pygame.time.Clock()
+
+ip = ''
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == 8:  # backspace
+                ip = ip[:-1]
+                continue
+            if event.key == 13:  # enter
+                try:
+                    sockOut = connect_OutSocket(address=ip.split(':')[0], port=int(ip.split(':')[1]))
+                    sockIn = connect_InSocket(port=5556)
+                    continue
+
+                except socket.gaierror:  # todo: написать вывод сообщений об ошибке
+                    continue
+                except (IndexError, ValueError):
+                    continue
+                except OSError as e:
+                    if e.errno == 10048:
+                        print('вы уже подключенны к серверу')
+            ip = ip + event.unicode
+            print(event.unicode, event.key, event.mod)
+            print(ip)
+    font = pygame.font.Font(None, 70)
+
+    phr = font.render(ip, 0, (100, 255, 100))
+    phr_w = phr.get_width() if phr.get_width() > 600 else 600
+    phr_h = phr.get_height()
+    phr_x = width // 2 - phr_w // 2
+    phr_y = height // 2 - phr_h // 2
 
 
-class Client:
-    def __init__(self, server_host, server_port_udp=1234, client_port_udp=1235):
-        self.identifier = None
-        self.server_message = []
-        self.room_id = None
-        self.client_udp = ("localhost", client_port_udp)
-        self.lock = threading.Lock()
-        self.server_listener = SocketThread(self.client_udp, self, self.lock)
-        self.server_listener.start()
-        self.server_udp = (server_host, server_port_udp)
+    text = font.render("Введите IP сервера (x.x.x.x:y):", 0, (100, 255, 100))
+    text_x = width // 2 - text.get_width() // 2
+    text_y = height // 2 - text.get_height() // 2 - phr.get_height() - 30
 
-    def send(self, msg):
-        message = json.dumps({
-            "action": "send",
-            "message": msg,
-            "identifier": self.identifier
-        })
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto(message.encode(), self.server_udp)
-
-    def get_messages(self):
-        message = self.server_message
-        self.server_message.clear()
-        return set(message)
-
-    def draw(self):
-        pygame.init()
-        size = 800, 800
-        screen = pygame.display.set_mode(size)
-        running = True
-        cl = pygame.time.Clock()
-        sockOut = connect_OutSocket()
-        sockIn = connect_InSocket(port=5556)
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                sock_send(sockOut, event)
-            print(read_sock(sockIn))
-            screen.fill((0, 0, 0))
-            pygame.display.flip()
-            cl.tick(60)
-        close_sock(sockOut)
-        close_sock(sockIn)
-        pygame.quit()
+    screen.fill((0, 0, 0))
+    screen.blit(text, (text_x, text_y))
+    screen.blit(phr, (phr_x, phr_y))
+    pygame.draw.rect(screen, (0, 255, 0), (phr_x - 10, phr_y - 10,
+                                           phr_w + 20, phr_h + 20), 1)
+    pygame.display.flip()
+    cl.tick(FPS)
 
 
-class SocketThread(threading.Thread):
-    def __init__(self, addr, client, lock):
 
-        threading.Thread.__init__(self)
-        self.client = client
-        self.lock = lock
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(addr)
 
-    def run(self):
-        while True:
-            data, addr = self.sock.recvfrom(1024)
-            self.lock.acquire()
-            try:
-                self.client.server_message.append(data)
-            finally:
-                self.lock.release()
 
-    def stop(self):
-        self.sock.close()
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        sock_send(sockOut, event)
+    print(read_sock(sockIn))
+    screen.fill((0, 0, 0))
+    pygame.display.flip()
+    cl.tick(FPS)
+
+
+close_sock(sockOut)
+close_sock(sockIn)
+pygame.quit()
+
+
+
