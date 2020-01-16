@@ -1,8 +1,8 @@
 from PIL import Image
 
 
-#example:
-#filename = 'resources\warped city files\SPRITES\player\hurt\hurt.png'
+# example:
+# filename = 'resources\warped city files\SPRITES\player\hurt\hurt.png'
 
 
 def get_bitmask(x, y, window_size, filename, chromokey=None):
@@ -49,4 +49,4 @@ def collide_mask(x1, y1, filename1,  # координаты 1-ого спрай�
                 return True
     return False
 
-#print(collide_mask(14, -15, filename, -15, -15, filename, (100, 100)))
+# print(collide_mask(14, -15, filename, -15, -15, filename, (100, 100)))
