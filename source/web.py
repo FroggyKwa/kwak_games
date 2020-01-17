@@ -2,26 +2,26 @@ import socket
 import json
 import threading
 
-
 def connect_InSocket(address='', port=5555):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.bind((address, port))
     return sock
 
 
 def connect_OutSocket(address='localhost', port=5555):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.connect((address, port))
     return sock
 
 
 def sock_send(sock, msg):
     sock.send(f'{msg}'.encode())
-
+    print(f'sent, {msg}\n{sock}')
 
 def read_sock(sock):
-    data = sock.recv(1024)
-    return data
+    data, address = sock.recvfrom(1024)
+    print(data, address)
+    return data.decode(), address
 
 
 def close_sock(sock):
