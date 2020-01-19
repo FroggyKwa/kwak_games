@@ -1,13 +1,14 @@
 import pygame
-from source.web import *
+import json
+from source.network import *
 import traceback  # todo: убрать эту штуку после дебага
+
 pygame.init()
 size = width, height = 1280, 800
 screen = pygame.display.set_mode(size)
 running = True
 FPS = 60
 cl = pygame.time.Clock()
-
 ip = ''
 msg_text = ''
 sockIn = connect_InSocket(port=5556)
@@ -25,7 +26,7 @@ while running:
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                #print(event.unicode, event.key, end='* ')
+                # print(event.unicode, event.key, end='* ')
                 if event.key == 8:  # backspace
                     ip = ip[:-1]
                     continue
@@ -53,6 +54,8 @@ while running:
                         data, address = read_sock(sockIn)  # todo: если сервер не включен то виснет, исправить
                         if data == '1':
                             msg_text = 'Подключение прошло успешно!'
+
+                            print(msg_text)
                             state = 3
                         elif data == '2':
                             msg_text = 'Вы уже подключены к данному серверу'
@@ -69,7 +72,6 @@ while running:
         phr_h = phr.get_height()
         phr_x = width // 2 - phr_w // 2
         phr_y = height // 2 - phr_h // 2
-
 
         text = font.render("Введите IP сервера (x.x.x.x:y):", 0, (100, 255, 100))
         text_x = width // 2 - text.get_width() // 2
@@ -88,20 +90,18 @@ while running:
 
     if state == 3:  # Игра
         for event in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            print(keys if any(keys) else '')
             if event.type == pygame.QUIT:
                 running = False
                 sock_send(sockOut, '0')
                 break
-            sock_send(sockOut, '2 ' + str(event))
+            sock_send(sockOut, '2 ' + ''.join(map(str, keys)))
         screen.fill((0, 255, 0))
 
     pygame.display.flip()
     cl.tick(FPS)
 
-
 close_sock(sockIn)
 close_sock(sockOut)
 pygame.quit()
-
-
-
