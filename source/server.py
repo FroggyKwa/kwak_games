@@ -1,10 +1,12 @@
-from source.web import connect_InSocket, connect_OutSocket, read_sock, sock_send, close_sock
-
+from source.network import connect_InSocket, connect_OutSocket, read_sock, sock_send, close_sock
+from source.player import Player
 
 sockIn = connect_InSocket()
 running = True
 
 clients = dict()
+players = list()
+bullets = list()
 while running:
     data, address = read_sock(sockIn)
     print(data, type(data))
@@ -20,6 +22,7 @@ while running:
             print('request denied: 3')
         else:
             clients[address] = connect_OutSocket(address=address[0], port=5556)
+            players.append(Player(100, 100, clients[address]))
             sock_send(clients[address], '1')
             print('request accepted')
         print(clients)
@@ -28,11 +31,33 @@ while running:
         sock_send(sock, '0')
         print('client is disconnected')
         close_sock(sock)
-        if len(clients.values()) == 0:
+        if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False
         print(clients)
-    elif data[0] == '2':
-        print(data)
+    elif data.startswith('2'):
+        player = None
+        for p in players:
+            if p.sock == connect_OutSocket(address=address[0], port=5556):
+                player = p
+                break
 
+        keys = tuple(data.split()[1])
+        print(keys)
+        if keys[119] or keys[32]:
+            player.move(direction='up')
+        if keys[97]:
+            player.move(direction='left')
+            player.direction = 'left'
+        if keys[100]:
+            player.move(direction='right')
+            player.direction = 'right'
+        if keys[275]:
+            player.direction = 'right'
+            bullets.append([player.x + 2, player.y + 2, 'right'])
+        if keys[276]:
+            player.direction = 'left'
+            bullets.append([player.x + 2, player.y + 2, 'left'])
+        if keys[27]:
+            pass  # открыть меню
 
 close_sock(sockIn)
