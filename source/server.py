@@ -23,7 +23,7 @@ while running:
             sock_send(clients[address], '1')
             print('request accepted')
         print(clients)
-    if data == '0':
+    elif data == '0':
         sock = clients.pop(address)
         sock_send(sock, '0')
         print('client is disconnected')
@@ -31,6 +31,8 @@ while running:
         if len(clients.values()) == 0:
             running = False
         print(clients)
+    elif data[0] == '2':
+        print(data)
 
 
 close_sock(sockIn)
