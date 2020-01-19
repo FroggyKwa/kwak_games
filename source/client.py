@@ -35,7 +35,7 @@ while running:
                 if event.key == 13:  # enter
                     try:
                         sockOut = connect_OutSocket(address=ip.split(':')[0], port=int(ip.split(':')[1]))
-                    except socket.gaierror:  # todo: написать вывод сообщений об ошибке
+                    except socket.gaierror:
                         msg_text = 'Сервер отключен или не сущесвует'
                         print(traceback.format_exc())
                         continue
@@ -86,10 +86,13 @@ while running:
         pygame.draw.rect(screen, (0, 255, 0), (phr_x - 10, phr_y - 10,
                                                phr_w + 20, phr_h + 20), 1)
 
-    if state == 3:
+    if state == 3:  # Игра
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                sock_send(sockOut, '0')
+                break
+            sock_send(sockOut, '2 ' + str(event))
         screen.fill((0, 255, 0))
 
     pygame.display.flip()
