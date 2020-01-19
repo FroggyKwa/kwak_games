@@ -16,11 +16,10 @@ def connect_OutSocket(address='localhost', port=5555):
 
 def sock_send(sock, msg):
     sock.send(f'{msg}'.encode())
-    print(f'sent, {msg}\n{sock}')
+
 
 def read_sock(sock):
     data, address = sock.recvfrom(1024)
-    print(data, address)
     return data.decode(), address
 
 
