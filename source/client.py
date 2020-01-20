@@ -1,5 +1,6 @@
 import pygame
 from source.network import *
+from threading import Thread
 import traceback  # todo: убрать эту штуку после дебага
 pygame.init()
 size = width, height = 1280, 800
@@ -9,9 +10,9 @@ FPS = 60
 cl = pygame.time.Clock()
 ip = ''
 msg_text = ''
-sockIn = connect_InSocket(address='0.0.0.0', port=5556)
+sockIn = connect_InSocket(port=5556)
 state = 2
-
+messages = list()
 while running:
     if state == 1:  # Меню
         for event in pygame.event.get():
@@ -52,7 +53,9 @@ while running:
                         data, address = read_sock(sockIn)  # todo: если сервер не включен то виснет, исправить
                         if data == '1':
                             msg_text = 'Подключение прошло успешно!'
-
+                            t1 = Thread(target=read_server_sock, args=(sockIn, messages))
+                            t1.start()
+                            print('Поток запущен')
                             print(msg_text)
                             state = 3
                         elif data == '2':
@@ -87,19 +90,23 @@ while running:
                                                phr_w + 20, phr_h + 20), 1)
 
     if state == 3:  # Игра
+        import pickle
         for event in pygame.event.get():
-            keys = pygame.key.get_pressed()
-            print(keys if any(keys) else '')
             if event.type == pygame.QUIT:
                 running = False
                 sock_send(sockOut, '0')
                 break
-            sock_send(sockOut, '2 ' + ''.join(map(str, keys)))
+        keys = pygame.key.get_pressed()
+        print(keys if any(keys) else '')
+        if messages:
+            print(messages)
+        sock_send(sockOut, '2 ' + ''.join(map(str, keys)))
         screen.fill((0, 255, 0))
 
     pygame.display.flip()
     cl.tick(FPS)
 
+t1.join()
 close_sock(sockIn)
 close_sock(sockOut)
 pygame.quit()

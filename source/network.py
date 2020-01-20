@@ -3,13 +3,13 @@ import json
 import threading
 
 
-def connect_InSocket(address='', port=5555):
+def connect_InSocket(address='0.0.0.0', port=5555):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.bind((address, port))
     return sock
 
 
-def connect_OutSocket(address='localhost', port=5555):
+def connect_OutSocket(address='0.0.0.0', port=5555):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     sock.connect((address, port))
     return sock
@@ -22,6 +22,11 @@ def sock_send(sock, msg):
 def read_sock(sock):
     data, address = sock.recvfrom(1024)
     return data.decode(), address
+
+
+def read_server_sock(sock, storage):
+    data, address = sock.recvfrom(2048)
+    storage.append((data.decode(), address))
 
 
 def close_sock(sock):
@@ -51,7 +56,7 @@ class Client:
     def get_messages(self):
         message = self.server_message
         self.server_message.clear()
-        return set(message)
+        return message
 
 
 class SocketThread(threading.Thread):

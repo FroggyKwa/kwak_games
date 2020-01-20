@@ -1,5 +1,7 @@
 from source.network import connect_InSocket, connect_OutSocket, read_sock, sock_send, close_sock
 from source.player import Player
+import time
+
 
 sockIn = connect_InSocket()
 running = True
@@ -7,6 +9,7 @@ running = True
 clients = dict()
 players = dict()
 bullets = list()
+cur_time = time.time()
 while running:
     data, address = read_sock(sockIn)
     print(data, type(data))
@@ -35,6 +38,14 @@ while running:
             running = False
         print(clients)
     elif data.startswith('2'):
+        # test our server
+        from random import randint
+        points = list()
+        if time.time() - cur_time >= 5:
+            points.append((randint(700, 1000), randint(700, 1000)))
+            cur_time = time.time()
+        reply = f'Hello, {address[0]}'
+        sock_send(clients[address], reply.encode())
         player = players[address]
         keys = tuple(data.split()[1])
         print(keys)
@@ -52,9 +63,4 @@ while running:
         if keys[276]:
             player.direction = 'left'
             bullets.append([player.x + 2, player.y + 2, 'left'])
-        if keys[27]:
-            pass  # открыть меню
-
 close_sock(sockIn)
-
-# 172.19.29.127:5555
