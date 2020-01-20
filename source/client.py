@@ -1,8 +1,6 @@
 import pygame
-import json
 from source.network import *
 import traceback  # todo: убрать эту штуку после дебага
-
 pygame.init()
 size = width, height = 1280, 800
 screen = pygame.display.set_mode(size)
@@ -11,7 +9,7 @@ FPS = 60
 cl = pygame.time.Clock()
 ip = ''
 msg_text = ''
-sockIn = connect_InSocket(port=5556)
+sockIn = connect_InSocket(address='0.0.0.0', port=5556)
 state = 2
 
 while running:

@@ -5,7 +5,7 @@ sockIn = connect_InSocket()
 running = True
 
 clients = dict()
-players = list()
+players = dict()
 bullets = list()
 while running:
     data, address = read_sock(sockIn)
@@ -22,7 +22,7 @@ while running:
             print('request denied: 3')
         else:
             clients[address] = connect_OutSocket(address=address[0], port=5556)
-            players.append(Player(100, 100, clients[address]))
+            players[address] = Player(100, 100, clients[address])
             sock_send(clients[address], '1')
             print('request accepted')
         print(clients)
@@ -35,12 +35,7 @@ while running:
             running = False
         print(clients)
     elif data.startswith('2'):
-        player = None
-        for p in players:
-            if p.sock == connect_OutSocket(address=address[0], port=5556):
-                player = p
-                break
-
+        player = players[address]
         keys = tuple(data.split()[1])
         print(keys)
         if keys[119] or keys[32]:
@@ -61,3 +56,5 @@ while running:
             pass  # открыть меню
 
 close_sock(sockIn)
+
+# 172.19.29.127:5555
