@@ -25,8 +25,9 @@ def read_sock(sock):
 
 
 def read_server_sock(sock, storage):
-    data, address = sock.recvfrom(2048)
-    storage.append((data.decode(), address))
+    while True:
+        data, address = sock.recvfrom(2048)
+        storage.append((data.decode(), address))
 
 
 def close_sock(sock):

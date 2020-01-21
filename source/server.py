@@ -10,6 +10,7 @@ clients = dict()
 players = dict()
 bullets = list()
 cur_time = time.time()
+points = list()
 while running:
     data, address = read_sock(sockIn)
     print(data, type(data))
@@ -40,14 +41,14 @@ while running:
     elif data.startswith('2'):
         # test our server
         from random import randint
-        points = list()
-        if time.time() - cur_time >= 5:
-            points.append((randint(700, 1000), randint(700, 1000)))
+        if time.time() - cur_time >= 2:
+            points.append((randint(10, 700), randint(10, 1000)))
             cur_time = time.time()
-        reply = f'Hello, {address[0]}'
-        sock_send(clients[address], reply.encode())
+        reply = ' '.join([f'{a}_{b}' for a, b in points])
+        print(reply)
+        sock_send(clients[address], reply)
         player = players[address]
-        keys = tuple(data.split()[1])
+        keys = tuple(map(int, list(data.split()[1])))
         print(keys)
         if keys[119] or keys[32]:
             player.move(direction='up')

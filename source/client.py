@@ -90,18 +90,23 @@ while running:
                                                phr_w + 20, phr_h + 20), 1)
 
     if state == 3:  # Игра
-        import pickle
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 sock_send(sockOut, '0')
                 break
         keys = pygame.key.get_pressed()
-        print(keys if any(keys) else '')
+        # print(keys if any(keys) else '')
+        coords = list()
         if messages:
-            print(messages)
+            print(messages[0][0])
+            coords = [tuple(map(int, coord.split('_'))) for coord in messages[0][0].split()]
+            messages.clear()
+            print(coords)
         sock_send(sockOut, '2 ' + ''.join(map(str, keys)))
         screen.fill((0, 255, 0))
+        for x, y in coords:
+            pygame.draw.circle(screen, pygame.color.Color('Red'), (x, y), 30)
 
     pygame.display.flip()
     cl.tick(FPS)
