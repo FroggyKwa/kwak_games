@@ -90,7 +90,6 @@ while running:
                                                phr_w + 20, phr_h + 20), 1)
 
     if state == 3:  # Игра
-        import pickle
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -102,7 +101,6 @@ while running:
             print(messages)
         sock_send(sockOut, '2 ' + ''.join(map(str, keys)))
         screen.fill((0, 255, 0))
-
     pygame.display.flip()
     cl.tick(FPS)
 

@@ -38,14 +38,6 @@ while running:
             running = False
         print(clients)
     elif data.startswith('2'):
-        # test our server
-        from random import randint
-        points = list()
-        if time.time() - cur_time >= 5:
-            points.append((randint(700, 1000), randint(700, 1000)))
-            cur_time = time.time()
-        reply = f'Hello, {address[0]}'
-        sock_send(clients[address], reply.encode())
         player = players[address]
         keys = tuple(data.split()[1])
         print(keys)
