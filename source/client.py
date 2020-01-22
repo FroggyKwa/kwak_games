@@ -10,9 +10,10 @@ FPS = 60
 cl = pygame.time.Clock()
 ip = ''
 msg_text = ''
-sockIn = connect_InSocket(port=5556)
+sockIn = connect_InSocket(address='0.0.0.0', port=5556)
 state = 2
 messages = list()
+x, y, hp, d = 0, 0, 100, 'right'  # todo:мусор
 while running:
     if state == 1:  # Меню
         for event in pygame.event.get():
@@ -96,11 +97,35 @@ while running:
                 sock_send(sockOut, '0')
                 break
         keys = pygame.key.get_pressed()
-        print(keys if any(keys) else '')
+        # print(keys if any(keys) else '')
+        #coords = list()
+        bullets = list()  # todo:мусор
+        enemies = list()  # todo:мусор
         if messages:
-            print(messages)
+            print(messages[0][0])
+            #coords = [tuple(map(int, coord.split('_'))) for coord in messages[0][0].split()]
+            data = messages[0][0].split()
+            print(data)
+            x, y, hp, d = int(data.pop(0)), int(data.pop(0)), int(data.pop(0)), data.pop(0)  # todo:мусор
+            for i in range(int(data.pop(0))):  # todo:мусор
+                bullets.append((int(data.pop(0)), int(data.pop(0))))
+            for i in range(int(data.pop(0))):  # todo:мусор
+                enemies.append((int(data.pop(0)), int(data.pop(0)), data.pop(0)))
+            messages.clear()
         sock_send(sockOut, '2 ' + ''.join(map(str, keys)))
-        screen.fill((0, 255, 0))
+        screen.fill((0, 0, 0))
+        player = pygame.Surface((30, 50))
+        player.fill((0, 0, 255))
+        screen.blit(player, (x, y))  # todo:мусор
+        for i in bullets:  # todo:мусор
+            bullet = pygame.Surface((10, 5))
+            bullet.fill((100, 100, 100))
+            screen.blit(bullet, (i[0], i[1]))
+        for i in enemies:  # todo:мусор
+            enemy = pygame.Surface((30, 50))
+            enemy.fill((255, 0, 0))
+            screen.blit((i[0], i[1]), enemy)
+
     pygame.display.flip()
     cl.tick(FPS)
 

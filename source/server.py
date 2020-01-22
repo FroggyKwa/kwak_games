@@ -3,13 +3,15 @@ from source.player import Player
 import time
 
 
-sockIn = connect_InSocket()
+sockIn = connect_InSocket(address='0.0.0.0')
 running = True
+print(sockIn.getsockname())
 
 clients = dict()
 players = dict()
 bullets = list()
 cur_time = time.time()
+points = list()
 while running:
     data, address = read_sock(sockIn)
     print(data, type(data))
@@ -38,8 +40,16 @@ while running:
             running = False
         print(clients)
     elif data.startswith('2'):
+        # test our server
+        #from random import randint
+        #if time.time() - cur_time >= 2:
+        #    points.append((randint(10, 1500), randint(10, 700)))
+        #    cur_time = time.time()
+        #reply = ' '.join([f'{a}_{b}' for a, b in points])
+        #print(reply)
+        #sock_send(clients[address], reply)
         player = players[address]
-        keys = tuple(data.split()[1])
+        keys = tuple(map(int, list(data.split()[1])))
         print(keys)
         if keys[119] or keys[32]:
             player.move(direction='up')
@@ -55,4 +65,16 @@ while running:
         if keys[276]:
             player.direction = 'left'
             bullets.append([player.x + 2, player.y + 2, 'left'])
+    for addr in players.keys():
+        p = players
+        x, y, hp, d = p[addr].x, p[addr].y, p[addr].hp, p[addr].direction
+        bullets_str = str(len(bullets)) + ' ' + \
+                      ' '.join([str(i[0]) + ' ' + str(i[1]) for i in bullets])
+        players_str = str(len(p) - 1) + ' ' + \
+                      ' '.join([str(i.x) + ' ' + str(i.y) + ' ' + i.direction
+                                for i in p.values() if i != p[addr]])
+        reply = f'{x} {y} {hp} {d} {bullets_str} {players_str}'
+        sock_send(clients[addr], reply)
+
+
 close_sock(sockIn)
