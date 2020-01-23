@@ -13,7 +13,7 @@ class Player:
         self.ip = None
         self.sock = socket
         self.hp = 100
-        self.onGround = True
+        self.onGround = False
         self.update(x0, y0)
 
     def update(self, x, y):

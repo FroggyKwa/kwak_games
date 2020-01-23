@@ -24,9 +24,10 @@ def read_sock(sock):
     return data.decode(), address
 
 
-def read_server_sock(sock, storage):
-    data, address = sock.recvfrom(2048)
-    storage.append((data.decode(), address))
+def read_server_sock(sock, storage, alive):
+    while alive:
+        data, address = sock.recvfrom(2048)
+        storage.append((data.decode(), address))
 
 
 def close_sock(sock):

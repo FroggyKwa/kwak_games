@@ -17,7 +17,7 @@ while running:
     if data == '1':
         if address in clients.keys():
             sock_send(clients[address], '2')
-            print('request denied: 2')
+            print('request de`nied: 2')
         elif len(clients.values()) >= 4:
             sock = connect_OutSocket(address=address[0], port=5556)
             sock_send(sock, '3')

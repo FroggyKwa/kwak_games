@@ -55,7 +55,7 @@ while running:
                         data, address = read_sock(sockIn)  # todo: если сервер не включен то виснет, исправить
                         if data == '1':
                             msg_text = 'Подключение прошло успешно!'
-                            t1 = Thread(target=read_server_sock, args=(sockIn, messages))
+                            t1 = Thread(target=read_server_sock, args=(sockIn, messages, running))
                             t1.start()
                             print('Поток запущен')
                             print(msg_text)
@@ -103,11 +103,12 @@ while running:
         bullets = list()  # todo:мусор
         enemies = list()  # todo:мусор
         if messages:
+            print(messages)
             print(messages[0][0])
             #coords = [tuple(map(int, coord.split('_'))) for coord in messages[0][0].split()]
             data = messages[0][0].split()
             print(data)
-            x, y, hp, d = int(data.pop(0)), int(data.pop(0)), int(data.pop(0)), data.pop(0)  # todo:мусор
+            x, y, hp, d = int(float(data.pop(0))), int(float(data.pop(0))), int(data.pop(0)), data.pop(0)  # todo:мусор
             for i in range(int(data.pop(0))):  # todo:мусор
                 bullets.append((int(data.pop(0)), int(data.pop(0))))
             for i in range(int(data.pop(0))):  # todo:мусор
