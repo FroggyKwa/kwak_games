@@ -1,6 +1,6 @@
 import pygame
 from source.network import *
-from source.read_map import *
+from source.get_map import *
 from threading import Thread
 import traceback  # todo: убрать эту штуку после дебага
 pygame.init()
@@ -57,6 +57,7 @@ while running:
                             msg_text = 'Подключение прошло успешно!'
                             t1 = Thread(target=read_server_sock, args=(sockIn, messages, running))
                             t1.start()
+                            game_background = get_map()
                             print('Поток запущен')
                             print(msg_text)
                             state = 3
@@ -110,12 +111,12 @@ while running:
             print(data)
             x, y, hp, d = int(float(data.pop(0))), int(float(data.pop(0))), int(data.pop(0)), data.pop(0)  # todo:мусор
             for i in range(int(data.pop(0))):  # todo:мусор
-                bullets.append((int(data.pop(0)), int(data.pop(0))))
+                bullets.append((int(float(data.pop(0))), int(float(data.pop(0)))))
             for i in range(int(data.pop(0))):  # todo:мусор
                 enemies.append((int(data.pop(0)), int(data.pop(0)), data.pop(0)))
             messages.clear()
         sock_send(sockOut, '2 ' + ''.join(map(str, keys)))
-        draw_map(screen)
+        screen.blit(game_background, (0, 0))
         player = pygame.Surface((30, 50))
         player.fill((0, 0, 255))
         screen.blit(player, (x, y))  # todo:мусор

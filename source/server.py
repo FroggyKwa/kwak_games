@@ -66,7 +66,7 @@ while running:
                       ' '.join([str(i.x) + ' ' + str(i.y) + ' ' + i.direction
                                 for i in p.values() if i != p[addr]])
         reply = f'{x} {y} {hp} {d} {bullets_str} {players_str}'
-        if time.time() - cur_time >= 0.01:
+        if time.time() - cur_time >= 0.001:
             try:
                 sock_send(clients[addr], reply)
             except KeyError:
@@ -75,7 +75,7 @@ while running:
         if time.time() - cur_time >= 0.1:
             # пульки движутся со скоростью 10 пикселей в секунду
             bullets = list(map(lambda b: [b[0] + 1, b[1], b[2]], bullets))
-        if time.time() - cur_time >= 0.4:
+        if time.time() - cur_time >= 0.001:
             for p in players.values():
                 p.move()
 

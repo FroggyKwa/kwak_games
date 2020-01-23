@@ -1,5 +1,5 @@
-JUMP_POWER = 10
-GRAVITY = 0.35
+JUMP_POWER = 2
+GRAVITY = 0.5
 MOVE_SPEED = 7
 
 
@@ -13,7 +13,7 @@ class Player:
         self.ip = None
         self.sock = socket
         self.hp = 100
-        self.onGround = False
+        self.onGround = True
         self.update(x0, y0)
 
     def update(self, x, y):
