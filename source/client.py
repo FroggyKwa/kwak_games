@@ -1,5 +1,6 @@
 import pygame
 from source.network import *
+from source.read_map import *
 from threading import Thread
 import traceback  # todo: убрать эту штуку после дебага
 pygame.init()
@@ -113,7 +114,7 @@ while running:
                 enemies.append((int(data.pop(0)), int(data.pop(0)), data.pop(0)))
             messages.clear()
         sock_send(sockOut, '2 ' + ''.join(map(str, keys)))
-        screen.fill((0, 0, 0))
+        draw_map(screen)
         player = pygame.Surface((30, 50))
         player.fill((0, 0, 255))
         screen.blit(player, (x, y))  # todo:мусор
@@ -125,7 +126,6 @@ while running:
             enemy = pygame.Surface((30, 50))
             enemy.fill((255, 0, 0))
             screen.blit((i[0], i[1]), enemy)
-
     pygame.display.flip()
     cl.tick(FPS)
 
