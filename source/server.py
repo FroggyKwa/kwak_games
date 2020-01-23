@@ -42,13 +42,15 @@ while running:
         keys = tuple(map(int, list(data.split()[1])))
         print(keys)
         if keys[119] or keys[32]:
-            player.move(direction='up')
+            player.change_velocity(direction='up')
         if keys[97]:
-            player.move(direction='left')
+            player.change_velocity(direction='left')
             player.direction = 'left'
         if keys[100]:
-            player.move(direction='right')
+            player.change_velocity(direction='right')
             player.direction = 'right'
+        if not (keys[119] or keys[32] or keys[97] or keys[100]):
+            player.change_velocity()
         if keys[275]:
             player.direction = 'right'
             bullets.append([player.x + 2, player.y + 2, 'right'])
@@ -65,6 +67,16 @@ while running:
                                 for i in p.values() if i != p[addr]])
         reply = f'{x} {y} {hp} {d} {bullets_str} {players_str}'
         if time.time() - cur_time >= 0.01:
-            sock_send(clients[addr], reply)
+            try:
+                sock_send(clients[addr], reply)
+            except KeyError:
+                pass
+        print(list([(p.x, p.y, p.x_velocity, p.y_velocity) for p in players.values()]))
+        if time.time() - cur_time >= 0.1:
+            # пульки движутся со скоростью 10 пикселей в секунду
+            bullets = list(map(lambda b: [b[0] + 1, b[1], b[2]], bullets))
+        if time.time() - cur_time >= 0.4:
+            for p in players.values():
+                p.move()
 
 close_sock(sockIn)

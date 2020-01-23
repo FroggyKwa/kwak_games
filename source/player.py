@@ -13,26 +13,30 @@ class Player:
         self.ip = None
         self.sock = socket
         self.hp = 100
-        self.onGround = False
+        self.onGround = True
         self.update(x0, y0)
 
     def update(self, x, y):
         self.x = x
         self.y = y
 
-    def move(self, direction=None):
+    def change_velocity(self, direction=None):
         if not direction:
             self.x_velocity = 0
+            if not self.onGround:
+                self.y_velocity += GRAVITY if self.y_velocity <= 10 else 0
         if direction == 'up':
             if self.onGround:
                 self.y_velocity = -JUMP_POWER
-                self.onGround = True
-            if not self.onGround:
-                self.y_velocity += GRAVITY
+                self.onGround = False
         if direction == 'left':
             self.x_velocity = -MOVE_SPEED
         if direction == 'right':
             self.x_velocity = MOVE_SPEED
+
+    def move(self):
+        self.y = self.y + self.y_velocity
+        self.x = self.x + self.x_velocity
 
     def get_damage(self, dmg):
         self.hp -= dmg if self.hp >= dmg else self.hp
