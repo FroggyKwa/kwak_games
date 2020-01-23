@@ -1,6 +1,7 @@
 import pygame
 from source.network import *
 from source.get_map import *
+from source.camera import *
 from threading import Thread
 import traceback  # todo: убрать эту штуку после дебага
 pygame.init()
@@ -14,6 +15,7 @@ msg_text = ''
 sockIn = connect_InSocket(address='0.0.0.0', port=5556)
 state = 2
 messages = list()
+camera = Camera(800, 800, (1280, 800))
 x, y, hp, d = 0, 0, 100, 'right'  # todo:мусор
 while running:
     if state == 1:  # Меню
