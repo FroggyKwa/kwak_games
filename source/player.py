@@ -1,4 +1,4 @@
-JUMP_POWER = 2.3
+JUMP_POWER = 20
 GRAVITY = 0.5
 MOVE_SPEED = 7
 
@@ -24,8 +24,6 @@ class Player:
     def change_velocity(self, direction=None):
         if not direction:
             self.x_velocity = 0
-            if not self.onGround:
-                self.y_velocity += GRAVITY if self.y_velocity <= 10 else 0
         if direction == 'up':
             if self.onGround:
                 self.y_velocity = -JUMP_POWER
@@ -34,6 +32,8 @@ class Player:
             self.x_velocity = -MOVE_SPEED
         if direction == 'right':
             self.x_velocity = MOVE_SPEED
+        if not self.onGround:
+            self.y_velocity += GRAVITY if self.y_velocity <= 10 else 0
 
     def move(self):
         self.y = self.y + self.y_velocity
