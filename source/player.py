@@ -15,6 +15,7 @@ class Player:
         self.hp = 100
         self.onGround = True
         self.update(x0, y0)
+        self.cur_shoot_time = 0
 
     def update(self, x, y):
         self.x = x

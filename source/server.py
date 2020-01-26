@@ -53,10 +53,23 @@ while running:
             player.change_velocity()
         if keys[275]:
             player.direction = 'right'
-            bullets.append([player.x + 2, player.y + 2, 'right'])
+            if not player.cur_shoot_time:
+                bullets.append([player.x + 2, player.y + 2, 'right', 180])
+                player.cur_shoot_time = 30
         if keys[276]:
             player.direction = 'left'
-            bullets.append([player.x + 2, player.y + 2, 'left'])
+            if not player.cur_shoot_time:
+                bullets.append([player.x + 2, player.y + 2, 'left', 180])
+                player.cur_shoot_time = 30
+    for i in players.values():
+        print(i, players)
+        if i.cur_shoot_time:
+            i.cur_shoot_time -= 1
+    for i in bullets:  # уменьшается жизнь пуль
+        print(i)
+        i[3] -= 1
+        if not i[3]:
+            bullets.remove(i)
     for addr in players.keys():
         p = players
         x, y, hp, d = p[addr].x, p[addr].y, p[addr].hp, p[addr].direction
@@ -73,8 +86,13 @@ while running:
                 pass
         print(list([(p.x, p.y, p.x_velocity, p.y_velocity) for p in players.values()]))
         if time.time() - cur_time >= 0.1:
-            # пульки движутся со скоростью 10 пикселей в секунду
-            bullets = list(map(lambda b: [b[0] + 1, b[1], b[2]], bullets))
+            # пульки движутся со скоростью 200 пикселей в секунду
+            b = list()
+            for i in bullets:
+                v = 20 if i[2] == 'right' else -20
+                b.append([i[0] + v, i[1], i[2], i[3]])
+            bullets = b
+            #bullets = list(map(lambda b: [b[0] + 20, b[1], b[2], b[3]], bullets))
         if time.time() - cur_time >= 0.001:
             for p in players.values():
                 p.move()
