@@ -44,7 +44,8 @@ class Button:
 
     def check_cursor_release_button(self, x, y):
         if (self.x + self.h < x < self.x + self.width - self.h) and \
-                (self.y + self.h < y < self.y + self.height - self.h):
+                (self.y + self.h < y < self.y + self.height - self.h) and self.state == 3:
+            self.state = 1
             return True
         else:
             self.state = 1

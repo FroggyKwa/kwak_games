@@ -6,6 +6,7 @@ from source.button import *
 from threading import Thread
 import traceback  # todo: убрать эту штуку после дебага
 pygame.init()
+pygame.display.set_caption("CyberForce_2077")
 size = width, height = 1280, 800
 screen = pygame.display.set_mode(size)
 running = True
@@ -18,42 +19,52 @@ state = 1
 messages = list()
 camera = Camera(800, 800, (1280, 800))
 x, y, hp, d = 0, 0, 100, 'right'  # todo:мусор
-buttons = [Button(400, 100, width // 2 - 200, 150, (10, 10, 10), (5, 5, 5), (15, 15, 15), "Join server")]
+buttons_menu = [Button(400, 60, width // 2 - 200, 160, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
+                Button(400, 60, width // 2 - 200, 245, (5, 5, 5), (15, 15, 15),  (25, 25, 25), "Authors"),
+                Button(400, 60, width // 2 - 200, 325, (5, 5, 5), (15, 15, 15),  (25, 25, 25), "Training"),
+                Button(400, 60, width // 2 - 200, 410, (5, 5, 5), (15, 15, 15),  (25, 25, 25), "Settings")]
+bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
+buttons_authors = [Button(400, 60, width // 2 - 200, 385, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+buttons_training = [Button(400, 60, width // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+buttons_settings = [Button(400, 60, width // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+magenta = (200, 0, 255)
 while running:
     if state == 1:  # Меню
-        screen.fill((255, 0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                print(x, y)
-                for i in buttons:
+                for i in buttons_menu:
                     if Button.check_cursor_click_button(i, x, y):
                         continue
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = event.pos
-                for i in buttons:
+                for i in buttons_menu:
                     if Button.check_cursor_release_button(i, x, y):
                         name_button = Button.get_name(i)
                         if name_button == "Join server":
                             state = 2
+                        if name_button == "Authors":
+                            state = 4
+                        if name_button == "Training":
+                            state = 6
+                        if name_button == "Settings":
+                            state = 5
         else:
             x, y = pygame.mouse.get_pos()
-            for i in buttons:
+            for i in buttons_menu:
                 if Button.check_cursor_on_button(i, x, y):
                     continue
-
-        for i in buttons:
+        screen.blit(bg_menu, (0, 0))
+        for i in buttons_menu:
             x, y, b_width, b_height, color, name_button = i.draw()
-            # print(x, y, b_width, b_height, color)
-            # print(Button.get_name(i))
             pygame.draw.rect(screen, color, (x, y, b_width, b_height))
             font = pygame.font.Font(None, 70)
-            text = font.render(Button.get_name(i), 0, (200, 0, 255))
-            #text_x = width // 2 - text.get_width() // 2
-            #text_y = height // 2 - text.get_height() // 2 - phr.get_height() - 30
-            screen.blit(text, (540, 150))
+            text = font.render(Button.get_name(i), 0, magenta)
+            text_x = x + b_width // 2 - text.get_width() // 2
+            text_y = y + b_height // 2 - text.get_height() // 2
+            screen.blit(text, (text_x, text_y))
 
     if state == 2:  # Подключение
         for event in pygame.event.get():
@@ -161,6 +172,115 @@ while running:
             enemy = pygame.Surface((30, 50))
             enemy.fill((255, 0, 0))
             screen.blit((i[0], i[1]), enemy)
+
+    if state == 4:  # авторы игры
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                for i in buttons_authors:
+                    if Button.check_cursor_click_button(i, x, y):
+                        continue
+            if event.type == pygame.MOUSEBUTTONUP:
+                x, y = event.pos
+                for i in buttons_authors:
+                    if Button.check_cursor_release_button(i, x, y):
+                        name_button = Button.get_name(i)
+                        if name_button == "Return to menu":
+                            state = 1
+        else:
+            x, y = pygame.mouse.get_pos()
+            for i in buttons_authors:
+                if Button.check_cursor_on_button(i, x, y):
+                    continue
+        screen.blit(bg_menu, (0, 0))
+        font = pygame.font.Font(None, 70)
+        text = font.render("Authors:", 0, magenta)
+        text_x = width // 2 - text.get_width() // 2
+        screen.blit(text, (text_x, 150))
+        text = font.render("Denis Bakushev", 0, magenta)
+        text_x = width // 2 - text.get_width() // 2
+        screen.blit(text, (text_x, 210))
+        text = font.render("Froggling Golovankov", 0, magenta)
+        text_x = width // 2 - text.get_width() // 2
+        screen.blit(text, (text_x, 270))
+        text = font.render("Pavel Rudnik", 0, magenta)
+        text_x = width // 2 - text.get_width() // 2
+        screen.blit(text, (text_x, 330))
+        for i in buttons_authors:
+            x, y, b_width, b_height, color, name_button = i.draw()
+            pygame.draw.rect(screen, color, (x, y, b_width, b_height))
+            font = pygame.font.Font(None, 70)
+            text = font.render(Button.get_name(i), 0, magenta)
+            text_x = x + b_width // 2 - text.get_width() // 2
+            text_y = y + b_height // 2 - text.get_height() // 2
+            screen.blit(text, (text_x, text_y))
+
+    if state == 5:  # настройки игры
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                for i in buttons_settings:
+                    if Button.check_cursor_click_button(i, x, y):
+                        continue
+            if event.type == pygame.MOUSEBUTTONUP:
+                x, y = event.pos
+                for i in buttons_settings:
+                    if Button.check_cursor_release_button(i, x, y):
+                        name_button = Button.get_name(i)
+                        if name_button == "Return to menu":
+                            state = 1
+        else:
+            x, y = pygame.mouse.get_pos()
+            for i in buttons_settings:
+                if Button.check_cursor_on_button(i, x, y):
+                    continue
+
+        screen.blit(bg_menu, (0, 0))
+        for i in buttons_settings:
+            x, y, b_width, b_height, color, name_button = i.draw()
+            pygame.draw.rect(screen, color, (x, y, b_width, b_height))
+            font = pygame.font.Font(None, 70)
+            text = font.render(Button.get_name(i), 0, magenta)
+            text_x = x + b_width // 2 - text.get_width() // 2
+            text_y = y + b_height // 2 - text.get_height() // 2
+            screen.blit(text, (text_x, text_y))
+
+    if state == 6:  # обучение
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                for i in buttons_training:
+                    if Button.check_cursor_click_button(i, x, y):
+                        continue
+            if event.type == pygame.MOUSEBUTTONUP:
+                x, y = event.pos
+                for i in buttons_training:
+                    if Button.check_cursor_release_button(i, x, y):
+                        name_button = Button.get_name(i)
+                        if name_button == "Return to menu":
+                            state = 1
+        else:
+            x, y = pygame.mouse.get_pos()
+            for i in buttons_training:
+                if Button.check_cursor_on_button(i, x, y):
+                    continue
+
+        screen.blit(bg_menu, (0, 0))
+        for i in buttons_training:
+            x, y, b_width, b_height, color, name_button = i.draw()
+            pygame.draw.rect(screen, color, (x, y, b_width, b_height))
+            font = pygame.font.Font(None, 70)
+            text = font.render(Button.get_name(i), 0, magenta)
+            text_x = x + b_width // 2 - text.get_width() // 2
+            text_y = y + b_height // 2 - text.get_height() // 2
+            screen.blit(text, (text_x, text_y))
+
     pygame.display.flip()
     cl.tick(FPS)
 
