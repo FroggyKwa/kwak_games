@@ -2,6 +2,7 @@ import pygame
 from source.network import *
 from source.get_map import *
 from source.camera import *
+from source.button import *
 from threading import Thread
 import traceback  # todo: убрать эту штуку после дебага
 pygame.init()
@@ -13,16 +14,46 @@ cl = pygame.time.Clock()
 ip = ''
 msg_text = ''
 sockIn = connect_InSocket(address='0.0.0.0', port=5556)
-state = 2
+state = 1
 messages = list()
 camera = Camera(800, 800, (1280, 800))
 x, y, hp, d = 0, 0, 100, 'right'  # todo:мусор
+buttons = [Button(400, 100, width // 2 - 200, 150, (10, 10, 10), (5, 5, 5), (15, 15, 15), "Join server")]
 while running:
     if state == 1:  # Меню
+        screen.fill((255, 0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        screen.fill((255, 0, 0))
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                print(x, y)
+                for i in buttons:
+                    if Button.check_cursor_click_button(i, x, y):
+                        continue
+            if event.type == pygame.MOUSEBUTTONUP:
+                x, y = event.pos
+                for i in buttons:
+                    if Button.check_cursor_release_button(i, x, y):
+                        name_button = Button.get_name(i)
+                        if name_button == "Join server":
+                            state = 2
+        else:
+            x, y = pygame.mouse.get_pos()
+            for i in buttons:
+                if Button.check_cursor_on_button(i, x, y):
+                    continue
+
+        for i in buttons:
+            x, y, b_width, b_height, color, name_button = i.draw()
+            # print(x, y, b_width, b_height, color)
+            # print(Button.get_name(i))
+            pygame.draw.rect(screen, color, (x, y, b_width, b_height))
+            font = pygame.font.Font(None, 70)
+            text = font.render(Button.get_name(i), 0, (200, 0, 255))
+            #text_x = width // 2 - text.get_width() // 2
+            #text_y = height // 2 - text.get_height() // 2 - phr.get_height() - 30
+            screen.blit(text, (540, 150))
 
     if state == 2:  # Подключение
         for event in pygame.event.get():
