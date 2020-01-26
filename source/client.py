@@ -18,15 +18,17 @@ sockIn = connect_InSocket(address='0.0.0.0', port=5556)
 state = 1
 messages = list()
 camera = Camera(800, 800, (1280, 800))
+sounds_is_on = True
 x, y, hp, d = 0, 0, 100, 'right'  # todo:мусор
 buttons_menu = [Button(400, 60, width // 2 - 200, 160, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
                 Button(400, 60, width // 2 - 200, 245, (5, 5, 5), (15, 15, 15),  (25, 25, 25), "Authors"),
                 Button(400, 60, width // 2 - 200, 325, (5, 5, 5), (15, 15, 15),  (25, 25, 25), "Training"),
                 Button(400, 60, width // 2 - 200, 410, (5, 5, 5), (15, 15, 15),  (25, 25, 25), "Settings")]
 bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
-buttons_authors = [Button(400, 60, width // 2 - 200, 385, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+buttons_authors = [Button(400, 60, width // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
 buttons_training = [Button(400, 60, width // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-buttons_settings = [Button(400, 60, width // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+buttons_settings = [Button(400, 60, width // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu"),
+                    Button(400, 60, width // 2 - 200, 180, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Turn off sounds")]
 magenta = (200, 0, 255)
 while running:
     if state == 1:  # Меню
@@ -233,6 +235,12 @@ while running:
                         name_button = Button.get_name(i)
                         if name_button == "Return to menu":
                             state = 1
+                        if name_button == "Turn off sounds":
+                            sounds_is_on = False
+                            Button.change_name(i, "Turn on sounds")
+                        if name_button == "Turn on sounds":
+                            sounds_is_on = True
+                            Button.change_name(i, "Turn off sounds")
         else:
             x, y = pygame.mouse.get_pos()
             for i in buttons_settings:

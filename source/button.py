@@ -53,3 +53,6 @@ class Button:
 
     def get_name(self):
         return self.name
+
+    def change_name(self, new_name):
+        self.name = new_name
