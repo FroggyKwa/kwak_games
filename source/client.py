@@ -10,7 +10,7 @@ import traceback  # todo: убрать эту штуку после дебага
 pygame.init()
 pygame.display.set_caption("CyB3r_F0rC3_2O77")
 size = width, height = 1280, 800
-screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 running = True
 FPS = 60
 cl = pygame.time.Clock()
