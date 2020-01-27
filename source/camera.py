@@ -6,8 +6,8 @@ class Camera:
         self.camera = pygame.Rect(0, 0, width, height)
         self.width = width
         self.height = height
-        self.size_width = size[0]
-        self.size_height = size[1]
+        self.size_width = size[0]  # размеры окна
+        self.size_height = size[1]  # размеры окна
 
     def apply(self, entity):
         return entity.rect.move(self.camera.topleft)
