@@ -6,12 +6,11 @@ from source.button import *
 from source import instances
 from threading import Thread
 import traceback  # todo: убрать эту штуку после дебага
-
 from PIL import ImageGrab
+
+
 size = width, height = ImageGrab.grab().size
-
-
-#size = width, height = 1280, 800
+# size = width, height = 1200, 800
 pygame.init()
 pygame.display.set_caption("CyB3r_F0rC3_2O77")
 screen = pygame.display.set_mode(size, pygame.RESIZABLE)
@@ -30,15 +29,18 @@ background = pygame.transform.scale(
 camera = Camera(1280, 800, (1280, 800))
 sounds_is_on = True
 x, y, hp, d = 0, 0, 100, 'right'  # todo:мусор
-buttons_menu = [Button(400, 60, width // 2 - 200, int(height * 0.2), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
-                Button(400, 60, width // 2 - 200, int(height * 0.30625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
-                Button(400, 60, width // 2 - 200, int(height * 0.40625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
-                Button(400, 60, width // 2 - 200, int(height * 0.5125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings")]
+w_b, h_b = width // 3, height // 15 # ширина и высота кнопки
+buttons_menu = [Button(w_b, h_b, width // 2 - (w_b // 2), int(height * 0.2), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
+                Button(w_b, h_b, width // 2 - (w_b // 2), int(height * 0.30625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
+                Button(w_b, h_b, width // 2 - (w_b // 2), int(height * 0.40625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
+                Button(w_b, h_b, width // 2 - (w_b // 2), int(height * 0.5125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings"),
+                Button(w_b, h_b, width // 2 - (w_b // 2), int(height * 0.6125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Quit game")]
 bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
-buttons_authors = [Button(400, 60, width // 2 - 200, int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-buttons_training = [Button(400, 60, width // 2 - 200, int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-buttons_settings = [Button(400, 60, width // 2 - 200, int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu"),
-                    Button(400, 60, width // 2 - 200, int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Turn off sounds")]
+bg_menu = pygame.transform.scale(bg_menu, (width, height))
+buttons_authors = [Button(w_b, h_b, width // 2 - (w_b // 2), int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+buttons_training = [Button(w_b, h_b, width // 2 - (w_b // 2), int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+buttons_settings = [Button(w_b, h_b, width // 2 - (w_b // 2), int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu"),
+                    Button(w_b, h_b, width // 2 - (w_b // 2), int(height * 0.25), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Turn off sounds")]
 #buttons_game
 magenta = (200, 0, 255)
 while running:
@@ -49,7 +51,10 @@ while running:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 for i in buttons_menu:
+                    print(x, y)
                     if Button.check_cursor_click_button(i, x, y):
+                        for j in buttons_menu:
+                            print(Button.draw(j))
                         continue
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = event.pos
@@ -64,6 +69,8 @@ while running:
                             state = 6
                         if name_button == "Settings":
                             state = 5
+                        if name_button == "Quit game":
+                            running = False
         else:
             x, y = pygame.mouse.get_pos()
             for i in buttons_menu:
@@ -184,6 +191,10 @@ while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_ESCAPE]:
+                    state = 1
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 for i in buttons_authors:
@@ -205,16 +216,16 @@ while running:
         font = pygame.font.Font(None, 70)
         text = font.render("Authors:", 0, magenta)
         text_x = width // 2 - text.get_width() // 2
-        screen.blit(text, (text_x, 150))
+        screen.blit(text, (text_x, int(height * 0.20)))
         text = font.render("Denis \"ReptileSD\" Bakushev", 0, magenta)
         text_x = width // 2 - text.get_width() // 2
-        screen.blit(text, (text_x, 210))
+        screen.blit(text, (text_x, int(height * 0.265)))
         text = font.render("Froggling Golovankov", 0, magenta)
         text_x = width // 2 - text.get_width() // 2
-        screen.blit(text, (text_x, 270))
+        screen.blit(text, (text_x, int(height * 0.33)))
         text = font.render("Pavel Rudnik", 0, magenta)
         text_x = width // 2 - text.get_width() // 2
-        screen.blit(text, (text_x, 330))
+        screen.blit(text, (text_x, int(height * 0.395)))
         for i in buttons_authors:
             x, y, b_width, b_height, color, name_button = i.draw()
             pygame.draw.rect(screen, color, (x, y, b_width, b_height))
@@ -228,6 +239,10 @@ while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_ESCAPE]:
+                    state = 1
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 for i in buttons_settings:
@@ -266,6 +281,10 @@ while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_ESCAPE]:
+                    state = 1
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 for i in buttons_training:
