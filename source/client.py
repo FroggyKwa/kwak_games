@@ -69,6 +69,7 @@ while running:
             for i in buttons_menu:
                 if Button.check_cursor_on_button(i, x, y):
                     continue
+        screen.fill((0, 0, 0))
         screen.blit(bg_menu, (0, 0))
         for i in buttons_menu:
             x, y, b_width, b_height, color, name_button = i.draw()
