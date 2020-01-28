@@ -7,9 +7,13 @@ from source import instances
 from threading import Thread
 import traceback  # todo: убрать эту штуку после дебага
 
+from PIL import ImageGrab
+size = width, height = ImageGrab.grab().size
+
+
+#size = width, height = 1280, 800
 pygame.init()
 pygame.display.set_caption("CyB3r_F0rC3_2O77")
-size = width, height = 1280, 800
 screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 running = True
 FPS = 60
@@ -26,15 +30,16 @@ background = pygame.transform.scale(
 camera = Camera(1280, 800, (1280, 800))
 sounds_is_on = True
 x, y, hp, d = 0, 0, 100, 'right'  # todo:мусор
-buttons_menu = [Button(400, 60, width // 2 - 200, 160, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
-                Button(400, 60, width // 2 - 200, 245, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
-                Button(400, 60, width // 2 - 200, 325, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
-                Button(400, 60, width // 2 - 200, 410, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings")]
+buttons_menu = [Button(400, 60, width // 2 - 200, int(height * 0.2), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
+                Button(400, 60, width // 2 - 200, int(height * 0.30625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
+                Button(400, 60, width // 2 - 200, int(height * 0.40625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
+                Button(400, 60, width // 2 - 200, int(height * 0.5125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings")]
 bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
-buttons_authors = [Button(400, 60, width // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-buttons_training = [Button(400, 60, width // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-buttons_settings = [Button(400, 60, width // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu"),
-                    Button(400, 60, width // 2 - 200, 180, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Turn off sounds")]
+buttons_authors = [Button(400, 60, width // 2 - 200, int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+buttons_training = [Button(400, 60, width // 2 - 200, int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+buttons_settings = [Button(400, 60, width // 2 - 200, int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu"),
+                    Button(400, 60, width // 2 - 200, int(height * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Turn off sounds")]
+#buttons_game
 magenta = (200, 0, 255)
 while running:
     if state == 1:  # Меню
