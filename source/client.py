@@ -200,7 +200,7 @@ while running:
         text = font.render("Authors:", 0, magenta)
         text_x = width // 2 - text.get_width() // 2
         screen.blit(text, (text_x, 150))
-        text = font.render("Denis Bakushev", 0, magenta)
+        text = font.render("Denis \"ReptileSD\" Bakushev", 0, magenta)
         text_x = width // 2 - text.get_width() // 2
         screen.blit(text, (text_x, 210))
         text = font.render("Froggling Golovankov", 0, magenta)
