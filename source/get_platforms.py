@@ -2,7 +2,7 @@ import pytmx
 import pygame
 
 
-def get_platforms(name_of_map="../source/resources/maps/map.tmx"):
+def get_platforms(name_of_map="../resources/maps/map.tmx"):
     surface = pygame.Surface((1280, 800), pygame.SRCALPHA, 32)
     gameMap = pytmx.load_pygame(name_of_map)
     for layer in gameMap.visible_layers:

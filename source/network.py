@@ -28,6 +28,8 @@ def read_server_sock(sock, storage, alive):
     while alive:
         data, address = sock.recvfrom(2048)
         storage.append((data.decode(), address))
+        if not alive:  # TODO: УДАЛИТЬ
+            return
 
 
 def close_sock(sock):

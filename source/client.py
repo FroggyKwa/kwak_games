@@ -59,11 +59,12 @@ while running:
                             state = 6
                         if name_button == "Settings":
                             state = 5
-        else:
-            x, y = pygame.mouse.get_pos()
-            for i in buttons_menu:
-                if Button.check_cursor_on_button(i, x, y):
-                    continue
+            else:
+                x, y = pygame.mouse.get_pos()
+                for i in buttons_menu:
+                    if Button.check_cursor_on_button(i, x, y):
+                        continue
+
         screen.blit(bg_menu, (0, 0))
         for i in buttons_menu:
             x, y, b_width, b_height, color, name_button = i.draw()
@@ -240,11 +241,11 @@ while running:
                         if name_button == "Turn on sounds":
                             sounds_is_on = True
                             Button.change_name(i, "Turn off sounds")
-        else:
-            x, y = pygame.mouse.get_pos()
-            for i in buttons_settings:
-                if Button.check_cursor_on_button(i, x, y):
-                    continue
+            else:
+                x, y = pygame.mouse.get_pos()
+                for i in buttons_settings:
+                    if Button.check_cursor_on_button(i, x, y):
+                        continue
 
         screen.blit(bg_menu, (0, 0))
         for i in buttons_settings:
@@ -272,11 +273,11 @@ while running:
                         name_button = Button.get_name(i)
                         if name_button == "Return to menu":
                             state = 1
-        else:
-            x, y = pygame.mouse.get_pos()
-            for i in buttons_training:
-                if Button.check_cursor_on_button(i, x, y):
-                    continue
+            else:
+                x, y = pygame.mouse.get_pos()
+                for i in buttons_training:
+                    if Button.check_cursor_on_button(i, x, y):
+                        continue
 
         screen.blit(bg_menu, (0, 0))
         for i in buttons_training:

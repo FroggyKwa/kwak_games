@@ -20,9 +20,6 @@ class Player(Entity):
 
     def update(self, x, y):
         self.rect.x, self.rect.y = x, y
-        self.cnt += 1
-        self.image = pygame.image.load(
-            f'resources/warped city files/SPRITES/player/walk/walk-{(self.cnt % 9) + 1}.png').convert_alpha()
 
 class Bullet(Entity):
     def __init__(self, screen):

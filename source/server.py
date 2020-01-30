@@ -92,7 +92,7 @@ while running:
                 v = 20 if i[2] == 'right' else -20
                 b.append([i[0] + v, i[1], i[2], i[3]])
             bullets = b
-            #bullets = list(map(lambda b: [b[0] + 20, b[1], b[2], b[3]], bullets))
+            # bullets = list(map(lambda b: [b[0] + 20, b[1], b[2], b[3]], bullets))
         if time.time() - cur_time >= 0.001:
             for p in players.values():
                 p.move()
