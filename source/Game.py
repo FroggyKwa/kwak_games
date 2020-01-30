@@ -221,7 +221,7 @@ class Game:
             font = pygame.font.Font(None, 70)
             text = font.render(button.Button.get_name(i), 0, self.magenta)
             text_x = x + b_WIDTH // 2 - text.get_width() // 2
-            text_y = y + b_HEIGHT // 2 - text.get_width() // 2
+            text_y = y + b_HEIGHT // 2 - text.get_height() // 2
             screen.blit(text, (text_x, text_y))
 
     def settings(self, event):
