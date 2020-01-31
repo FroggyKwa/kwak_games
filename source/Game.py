@@ -113,8 +113,10 @@ class Game:
             screen.blit(text, (text_x, text_y))
 
     def check_exit_event(self, event):
-        if event == pygame.QUIT:
+        if event.type == pygame.QUIT:
             self.running = False
+            print('хоп хей лалалей')
+        return not self.running
 
     def enter_ip_address(self, event):
         if event.key == 8:  # backspace
@@ -177,6 +179,7 @@ class Game:
             print(data)
             self.x, self.y, self.hp, self.d = int(float(data.pop(0))), int(float(data.pop(0))), int(
                 data.pop(0)), data.pop(0)  # todo:мусор
+            self.bullets = list()
             for i in range(int(data.pop(0))):  # todo:мусор
                 self.bullets.append((int(float(data.pop(0))), int(float(data.pop(0)))))
             for i in range(int(data.pop(0))):  # todo:мусор
@@ -309,8 +312,10 @@ class Game:
         while self.running:
             if self.state == 1:  # отрисовка меню
                 for event in pygame.event.get():
-                    self.check_exit_event(event)
+                    print(event)
+                    print(self.check_exit_event(event))
                     self.menu(event)
+                    print(self.running)
             if self.state == 2:  # ввод IP
                 for event in pygame.event.get():
                     self.check_exit_event(event)
@@ -319,8 +324,7 @@ class Game:
                     self.render_text(self.ip)
             if self.state == 3:  # Игра
                 for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.running = False
+                    if self.check_exit_event(event):
                         network.sock_send(self.sockOut, '0')
                         break
                 keys = pygame.key.get_pressed()
