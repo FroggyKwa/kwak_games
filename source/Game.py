@@ -17,10 +17,11 @@ WIDTH, HEIGHT = 1280, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 cl = pygame.time.Clock()
 FPS = 60
+magenta = (200, 0, 255)
+w_b, h_b = WIDTH // 3, HEIGHT // 15
 
 
 class Game:
-
     def __init__(self):
         self.sound = sounds
         self.images = images
@@ -32,6 +33,10 @@ class Game:
         self.running = True
         self.init_menu()
         self.init_joining_server()
+        self.pause = False
+        self.buttons_game_pause = [button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.3), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Continue"),
+                              button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.4), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+        self.buttons_game_not_pause = [button.Button(h_b, h_b, WIDTH // 2 - (h_b // 2), int(HEIGHT * 0.01), (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
 
     def init_menu(self):
         self.sounds_is_on = True
@@ -307,6 +312,28 @@ class Game:
             except TypeError:
                 print('something went wrong')
                 print(i)
+        if self.pause:
+            bg_darkness = pygame.Surface((WIDTH, HEIGHT))
+            bg_darkness.fill((0, 0, 0))
+            bg_darkness.set_alpha(150)
+            screen.blit(bg_darkness, (0, 0))
+            for i in self.buttons_game_pause:
+                x, y, b_width, b_height, color, name_button = i.draw()
+                pygame.draw.rect(screen, color, (x, y, b_width, b_height))
+                font = pygame.font.Font(None, 70)
+                text = font.render(button.Button.get_name(i), 0, magenta)
+                text_x = x + b_width // 2 - text.get_width() // 2
+                text_y = y + b_height // 2 - text.get_height() // 2
+                screen.blit(text, (text_x, text_y))
+        else:
+            for i in self.buttons_game_not_pause:
+                x, y, b_width, b_height, color, name_button = i.draw()
+                pygame.draw.rect(screen, color, (x, y, b_width, b_height))
+                font = pygame.font.Font(None, 70)
+                text = font.render(button.Button.get_name(i), 0, magenta)
+                text_x = x + b_width // 2 - text.get_width() // 2
+                text_y = y + b_height // 2 - text.get_height() // 2
+                screen.blit(text, (text_x, text_y))
 
     def run(self):
         while self.running:
@@ -327,6 +354,58 @@ class Game:
                     if self.check_exit_event(event):
                         network.sock_send(self.sockOut, '0')
                         break
+                    if event.type == pygame.KEYDOWN:
+                        keys = pygame.key.get_pressed()
+                        if keys[pygame.K_ESCAPE]:
+                            self.pause = False if self.pause else True
+                    if self.pause:
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            x, y = event.pos
+                            for i in self.buttons_game_pause:
+                                if button.Button.check_cursor_click_button(i, x, y):
+                                    for j in self.buttons_game_pause:
+                                        print(button.Button.draw(j))
+                                    continue
+                        if event.type == pygame.MOUSEBUTTONUP:
+                            x, y = event.pos
+                            for i in self.buttons_game_pause:
+                                print(0)
+                                if button.Button.check_cursor_release_button(i, x, y):
+                                    name_button = button.Button.get_name(i)
+                                    print(0, name_button)
+                                    if name_button == "Return to menu":
+                                        network.sock_send(self.sockOut, '0')
+                                        self.state = 1
+                                    if name_button == "Continue":
+                                        self.pause = False
+                    else:
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            x, y = event.pos
+                            for i in self.buttons_game_not_pause:
+                                if button.Button.check_cursor_click_button(i, x, y):
+                                    for j in self.buttons_game_not_pause:
+                                        print(button.Button.draw(j))
+                                    continue
+                        if event.type == pygame.MOUSEBUTTONUP:
+                            x, y = event.pos
+                            for i in self.buttons_game_not_pause:
+                                print(0)
+                                if button.Button.check_cursor_release_button(i, x, y):
+                                    name_button = button.Button.get_name(i)
+                                    print(0, name_button)
+                                    if name_button == "II":
+                                        self.pause = True
+                else:
+                    if self.pause:
+                        x, y = pygame.mouse.get_pos()
+                        for i in self.buttons_game_pause:
+                            if button.Button.check_cursor_on_button(i, x, y):
+                                continue
+                    else:
+                        x, y = pygame.mouse.get_pos()
+                        for i in self.buttons_game_not_pause:
+                            if button.Button.check_cursor_on_button(i, x, y):
+                                continue
                 keys = pygame.key.get_pressed()
                 self.parse_data()
                 network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
