@@ -1,5 +1,6 @@
 from source.network import connect_InSocket, connect_OutSocket, read_sock, sock_send, close_sock
 from source.player import Player
+from source.functions.bitmasks import get_bitmask, get_platforms_bitmask
 import time
 
 sockIn = connect_InSocket(address='0.0.0.0')
@@ -10,6 +11,7 @@ clients = dict()
 players = dict()
 bullets = list()
 points = list()
+plat_mask = get_platforms_bitmask("../source/resources/maps/map.tmx")
 while running:
     data, address = read_sock(sockIn)
     print(data, type(data))

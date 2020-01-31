@@ -13,4 +13,5 @@ def get_platforms(name_of_map="../source/resources/maps/map.tmx"):
                                     y * gameMap.tileheight))
             except:
                 continue
+
     return surface.convert_alpha(surface)
