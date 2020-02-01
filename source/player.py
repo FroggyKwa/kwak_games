@@ -1,3 +1,4 @@
+from source.functions.bitmasks import get_bitmask
 JUMP_POWER = 20
 GRAVITY = 0.5
 MOVE_SPEED = 7
@@ -35,8 +36,10 @@ class Player:
         if not self.onGround:
             self.y_velocity += GRAVITY if self.y_velocity <= 10 else 0
 
-    def move(self):
+    def move(self, mask, size):
+        x, y = self.x, self.y
         self.y = self.y + self.y_velocity
+        #if get_bitmask(self.x, self.y, size, )
         self.x = self.x + self.x_velocity
 
     def get_damage(self, dmg):

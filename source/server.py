@@ -2,16 +2,20 @@ from source.network import connect_InSocket, connect_OutSocket, read_sock, sock_
 from source.player import Player
 from source.functions.bitmasks import get_bitmask, get_platforms_bitmask
 import time
+import pygame
 
 sockIn = connect_InSocket(address='0.0.0.0')
 running = True
 print(sockIn.getsockname())
+pygame.init()
 cur_time = time.time()
+size = (1200, 800)
+pygame.display.set_mode(size)
 clients = dict()
 players = dict()
 bullets = list()
 points = list()
-plat_mask = get_platforms_bitmask("../source/resources/maps/map.tmx")
+plat_mask = get_platforms_bitmask("../source/resources/maps/map.tmx", size)
 while running:
     data, address = read_sock(sockIn)
     print(data, type(data))
@@ -97,6 +101,6 @@ while running:
             #bullets = list(map(lambda b: [b[0] + 20, b[1], b[2], b[3]], bullets))
         if time.time() - cur_time >= 0.001:
             for p in players.values():
-                p.move()
+                p.move(plat_mask, size)
 
 close_sock(sockIn)

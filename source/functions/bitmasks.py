@@ -1,6 +1,6 @@
 from PIL import Image
 from source.get_platforms import get_platforms
-import pytmx
+import pytmx, pygame
 
 def get_bitmask(x, y, window_size, file, chromokey=None):
     img = Image.open(file) if file is str else file
@@ -24,10 +24,9 @@ def get_bitmask(x, y, window_size, file, chromokey=None):
 
 
 def get_platforms_bitmask(filename, window_size):
-    import pygame
     sur = get_platforms(filename)
     pil_string_image = pygame.image.tostring(sur, "RGBA",False)
-    pil_image = Image.fromstring("RGBA", (sur.get_width(), sur.get_height()), pil_string_image)
+    pil_image = Image.frombytes("RGBA", (sur.get_width(), sur.get_height()), pil_string_image)
     return get_bitmask(0, 0, window_size, pil_image)
 
-print(get_platforms_bitmask('C:/Users/User/PycharmProjects/kwak_games/source/resources/maps/map.tmx'))
+#print(get_platforms_bitmask('C:/Users/User/PycharmProjects/kwak_games/source/resources/maps/map.tmx'))
