@@ -2,7 +2,7 @@ from PIL import Image
 
 
 # example:
-# filename = 'resources\warped city files\SPRITES\player\hurt\hurt.png'
+# filename = 'resources\warped city files\SPRITES\player\hurt\hurt-1.png'
 
 
 def get_bitmask(x, y, window_size, filename, chromokey=None):

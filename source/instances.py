@@ -8,19 +8,6 @@ class Entity(pygame.sprite.Sprite):
         self.image = None
 
 
-class Player(Entity):
-    def __init__(self, screen):
-        super().__init__(screen)
-        self.screen = screen
-        self.cnt = 1
-        self.image = pygame.image.load('resources/warped city files/SPRITES/player/walk/walk-1.png').convert_alpha()
-        self.rect = self.image.get_rect() if self.image else None
-        self.rect.x = 100
-        self.rect.y = 500
-
-    def update(self, x, y):
-        self.rect.x, self.rect.y = x, y
-
 class Bullet(Entity):
     def __init__(self, screen):
         super().__init__(screen)

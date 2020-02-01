@@ -8,6 +8,7 @@ from source import button
 from source import instances
 from threading import Thread
 from source.get_platforms import *
+from source.player import Player
 
 pygame.init()
 pygame.font.init()
@@ -32,6 +33,7 @@ class Game:
         self.init_buttons()
         self.init_joining_server()
         self.pause = False
+        self.timestamp = 0
 
     def init_buttons(self):
         self.sounds_is_on = True
@@ -67,7 +69,7 @@ class Game:
         t1 = Thread(target=network.read_server_sock, args=(self.sockIn, self.messages, self.running))
         t1.start()
         self.platforms = get_platforms()
-        self.player = instances.Player(screen)
+        self.player = Player(100, 100, screen=screen)
         self.bullets = list()  # todo:мусор
         self.enemies = list()  # todo:мусор
 
@@ -168,12 +170,10 @@ class Game:
 
     def parse_data(self):
         if self.messages:
-            print(self.messages)
-            print(self.messages[0][0])
             data = self.messages[0][0].split()
             print(data)
-            self.x, self.y, self.hp, self.d = int(float(data.pop(0))), int(float(data.pop(0))), int(
-                data.pop(0)), data.pop(0)  # todo:мусор
+            self.player.x, self.player.y, self.hp, self.player.direction, self.player.state = int(float(data.pop(0))), int(float(data.pop(0))), int(
+                data.pop(0)), data.pop(0), data.pop(0)  # todo:мусор
             self.bullets = list()
             for i in range(int(data.pop(0))):  # todo:мусор
                 self.bullets.append((int(float(data.pop(0))), int(float(data.pop(0)))))
@@ -247,6 +247,11 @@ class Game:
 
     def draw(self):
         self.camera.update(self.player)
+        if self.timestamp <= 70:
+            self.timestamp += cl.get_time()
+        else:
+            self.timestamp = 0
+            self.player.image = self.player.change_image()
         screen.blit(self.background, self.background.get_rect())
         screen.blit(self.platforms, self.camera.apply_rect(self.platforms.get_rect()))
         screen.blit(self.player.image, self.camera.apply(self.player))
@@ -329,7 +334,7 @@ class Game:
                 self.parse_data()
                 network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
                 try:
-                    self.player.update(self.x, self.y)
+                    self.player.update(self.player.x, self.player.y)
                 except ValueError:
                     continue
                 self.draw()

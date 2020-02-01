@@ -25,7 +25,7 @@ while running:
             print('request denied: 3')
         else:
             clients[address] = connect_OutSocket(address=address[0], port=5556)
-            players[address] = Player(100, 100, clients[address])
+            players[address] = Player(100, 100, socket=clients[address])
             sock_send(clients[address], '1')
             print('request accepted')
         print(clients)
@@ -43,21 +43,38 @@ while running:
         print(keys)
         if keys[119] or keys[32]:
             player.change_velocity(direction='up')
+            player.state = 'jump'
         if keys[97]:
             player.change_velocity(direction='left')
             player.direction = 'left'
+            if not player.state == 'jump':
+                player.state = 'run'
         if keys[100]:
             player.change_velocity(direction='right')
             player.direction = 'right'
+            if not player.state == 'jump':
+                player.state = 'run'
         if not (keys[119] or keys[32] or keys[97] or keys[100]):
             player.change_velocity()
+            if player.onGround:
+                player.state = 'idle'
         if keys[275]:
             player.direction = 'right'
+            player.shooting = True
+            if player.state == 'run':
+                player.state = 'run-shoot'
+            else:
+                player.state = 'shoot'
             if not player.cur_shoot_time:
                 bullets.append([player.x + 2, player.y + 2, 'right', 180])
                 player.cur_shoot_time = 30
         if keys[276]:
             player.direction = 'left'
+            player.shooting = True
+            if player.state == 'run':
+                player.state = 'run-shoot'
+            else:
+                player.state = 'shoot'
             if not player.cur_shoot_time:
                 bullets.append([player.x + 2, player.y + 2, 'left', 180])
                 player.cur_shoot_time = 30
@@ -72,19 +89,18 @@ while running:
             bullets.remove(i)
     for addr in players.keys():
         p = players
-        x, y, hp, d = p[addr].x, p[addr].y, p[addr].hp, p[addr].direction
+        x, y, hp, d, state = p[addr].x, p[addr].y, p[addr].hp, p[addr].direction, p[addr].state
         bullets_str = str(len(bullets)) + ' ' + \
                       ' '.join([str(i[0]) + ' ' + str(i[1]) for i in bullets])
         players_str = str(len(p) - 1) + ' ' + \
                       ' '.join([str(i.x) + ' ' + str(i.y) + ' ' + i.direction
                                 for i in p.values() if i != p[addr]])
-        reply = f'{x} {y} {hp} {d} {bullets_str} {players_str}'
+        reply = f'{x} {y} {hp} {d} {state} {bullets_str} {players_str}'
         if time.time() - cur_time >= 0.001:
             try:
                 sock_send(clients[addr], reply)
             except KeyError:
                 pass
-        print(list([(p.x, p.y, p.x_velocity, p.y_velocity) for p in players.values()]))
         if time.time() - cur_time >= 0.1:
             # пульки движутся со скоростью 200 пикселей в секунду
             b = list()
