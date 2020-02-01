@@ -56,9 +56,29 @@ class Player(pygame.sprite.Sprite):
         if not self.onGround:
             self.y_velocity += GRAVITY if self.y_velocity <= 5 else 0
 
-    def move(self):
+    def move(self, group):
+        x, y = self.x, self.y
         self.y = self.y + self.y_velocity
+        self.update(x, y)
+        spr = None
+        for i in group:
+            if pygame.sprite.collide_mask(self, i):
+                spr = i
+                break
+        if spr is not None:
+            self.rect.y = y
+            self.onGround = True
+            print(self.rect.x, self.rect.y)
         self.x = self.x + self.x_velocity
+        self.update(x, y)
+        for i in group:
+            if pygame.sprite.collide_mask(self, i):
+                spr = i
+                break
+        if spr is not None:
+            self.rect.x = x
+            print(self.rect.x, self.rect.y)
+
 
     def get_damage(self, dmg):
         self.hp -= dmg if self.hp >= dmg else self.hp

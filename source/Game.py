@@ -68,7 +68,7 @@ class Game:
     def init_game(self):
         t1 = Thread(target=network.read_server_sock, args=(self.sockIn, self.messages, self.running))
         t1.start()
-        self.platforms = get_platforms()
+        self.platforms = get_platforms_surface()
         self.player = Player(100, 100, screen=screen)
         self.bullets = list()  # todo:мусор
         self.enemies = list()  # todo:мусор
@@ -270,7 +270,7 @@ class Game:
             bg_darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA, 32)
             bg_darkness.fill((0, 0, 0))
             bg_darkness.set_alpha(150)
-            screen.blit(bg_darkness, (0, 0))
+            screen.blit(bg_darkness, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
             self.draw_buttons(self.buttons_game_pause)
         else:
             self.draw_buttons(self.buttons_game_not_pause)

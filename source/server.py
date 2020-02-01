@@ -1,15 +1,23 @@
 from source.network import connect_InSocket, connect_OutSocket, read_sock, sock_send, close_sock
 from source.player import Player
-import time
+from socket import gethostname, gethostbyname
+from source.instances import *
+import time, pygame
+from source.get_platforms import *
 
 sockIn = connect_InSocket(address='0.0.0.0')
 running = True
-print(sockIn.getsockname())
+print('IP:\n' + gethostbyname(gethostname()) + ':5555')
+pygame.init()
+size = WIDTH, HEIGHT = 1280, 800
+screen = pygame.display.set_mode(size)
 cur_time = time.time()
 clients = dict()
 players = dict()
-bullets = list()
-points = list()
+bullets = pygame.sprite.Group()
+platforms = pygame.sprite.Group()
+get_platforms(screen, platforms)
+#print(platforms)
 while running:
     data, address = read_sock(sockIn)
     print(data, type(data))
@@ -66,7 +74,7 @@ while running:
             else:
                 player.state = 'shoot'
             if not player.cur_shoot_time:
-                bullets.append([player.x + 2, player.y + 2, 'right', 180])
+                bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'right'))
                 player.cur_shoot_time = 30
         if keys[276]:
             player.direction = 'left'
@@ -76,22 +84,17 @@ while running:
             else:
                 player.state = 'shoot'
             if not player.cur_shoot_time:
-                bullets.append([player.x + 2, player.y + 2, 'left', 180])
+                bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'left'))
                 player.cur_shoot_time = 30
     for i in players.values():
         print(i, players)
         if i.cur_shoot_time:
             i.cur_shoot_time -= 1
-    for i in bullets:  # уменьшается жизнь пуль
-        print(i)
-        i[3] -= 1
-        if not i[3]:
-            bullets.remove(i)
     for addr in players.keys():
         p = players
         x, y, hp, d, state = p[addr].x, p[addr].y, p[addr].hp, p[addr].direction, p[addr].state
         bullets_str = str(len(bullets)) + ' ' + \
-                      ' '.join([str(i[0]) + ' ' + str(i[1]) for i in bullets])
+                      ' '.join([str(i.rect.x) + ' ' + str(i.rect.y) for i in bullets])
         players_str = str(len(p) - 1) + ' ' + \
                       ' '.join([str(i.x) + ' ' + str(i.y) + ' ' + i.direction
                                 for i in p.values() if i != p[addr]])
@@ -103,14 +106,11 @@ while running:
                 pass
         if time.time() - cur_time >= 0.1:
             # пульки движутся со скоростью 200 пикселей в секунду
-            b = list()
             for i in bullets:
-                v = 20 if i[2] == 'right' else -20
-                b.append([i[0] + v, i[1], i[2], i[3]])
-            bullets = b
+                i.move()
             # bullets = list(map(lambda b: [b[0] + 20, b[1], b[2], b[3]], bullets))
         if time.time() - cur_time >= 0.001:
             for p in players.values():
-                p.move()
+                p.move(platforms)
 
 close_sock(sockIn)
