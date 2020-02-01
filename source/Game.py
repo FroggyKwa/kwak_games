@@ -17,8 +17,6 @@ WIDTH, HEIGHT = 1280, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 cl = pygame.time.Clock()
 FPS = 60
-magenta = (200, 0, 255)
-w_b, h_b = WIDTH // 3, HEIGHT // 15
 
 
 class Game:
@@ -31,14 +29,11 @@ class Game:
         self.messages = list()
         self.camera = camera.Camera(1280, 800, (1280, 800))
         self.running = True
-        self.init_menu()
+        self.init_buttons()
         self.init_joining_server()
         self.pause = False
-        self.buttons_game_pause = [button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.3), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Continue"),
-                              button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.4), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-        self.buttons_game_not_pause = [button.Button(h_b, h_b, WIDTH // 2 - (h_b // 2), int(HEIGHT * 0.01), (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
 
-    def init_menu(self):
+    def init_buttons(self):
         self.sounds_is_on = True
         self.buttons_menu = [button.Button(400, 60, WIDTH // 2 - 200, 160, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
                         button.Button(400, 60, WIDTH // 2 - 200, 245, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
@@ -52,6 +47,16 @@ class Game:
         self.buttons_settings = [
             button.Button(400, 60, WIDTH // 2 - 200, 720, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu"),
             button.Button(400, 60, WIDTH // 2 - 200, 180, (5, 5, 5), (15, 15, 15), (25, 25, 25), "Turn off sounds")]
+        self.w_button, self.h_button = WIDTH // 3, HEIGHT // 15
+        self.buttons_game_pause = [
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.3), (5, 5, 5),
+                          (15, 15, 15), (25, 25, 25), "Continue"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.4), (5, 5, 5),
+                          (15, 15, 15), (25, 25, 25), "Return to menu")]
+        self.buttons_game_not_pause = [
+            button.Button(self.h_button, self.h_button, WIDTH // 2 - (self.h_button // 2), int(HEIGHT * 0.01),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
+
         self.magenta = (200, 0, 255)
 
     def init_joining_server(self):
@@ -153,7 +158,7 @@ class Game:
         print(event.unicode, event.key, event.mod)
         print(self.ip)
 
-    def render_text(self, ip):
+    def render_ip_text(self, ip):
         font = pygame.font.Font(None, 70)
         phr = font.render(ip, 0, (100, 255, 100))
         phr_w = phr.get_width() if phr.get_width() > 600 else 600
@@ -310,10 +315,9 @@ class Game:
             try:
                 screen.blit((i[0], i[1]), enemy)
             except TypeError:
-                print('something went wrong')
-                print(i)
+                self.enemies.clear()
         if self.pause:
-            bg_darkness = pygame.Surface((WIDTH, HEIGHT))
+            bg_darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA, 32)
             bg_darkness.fill((0, 0, 0))
             bg_darkness.set_alpha(150)
             screen.blit(bg_darkness, (0, 0))
@@ -321,7 +325,7 @@ class Game:
                 x, y, b_width, b_height, color, name_button = i.draw()
                 pygame.draw.rect(screen, color, (x, y, b_width, b_height))
                 font = pygame.font.Font(None, 70)
-                text = font.render(button.Button.get_name(i), 0, magenta)
+                text = font.render(button.Button.get_name(i), 0, self.magenta)
                 text_x = x + b_width // 2 - text.get_width() // 2
                 text_y = y + b_height // 2 - text.get_height() // 2
                 screen.blit(text, (text_x, text_y))
@@ -330,7 +334,7 @@ class Game:
                 x, y, b_width, b_height, color, name_button = i.draw()
                 pygame.draw.rect(screen, color, (x, y, b_width, b_height))
                 font = pygame.font.Font(None, 70)
-                text = font.render(button.Button.get_name(i), 0, magenta)
+                text = font.render(button.Button.get_name(i), 0, self.magenta)
                 text_x = x + b_width // 2 - text.get_width() // 2
                 text_y = y + b_height // 2 - text.get_height() // 2
                 screen.blit(text, (text_x, text_y))
@@ -348,7 +352,7 @@ class Game:
                     self.check_exit_event(event)
                     if event.type == pygame.KEYDOWN:
                         self.enter_ip_address(event)
-                    self.render_text(self.ip)
+                    self.render_ip_text(self.ip)
             if self.state == 3:  # Игра
                 for event in pygame.event.get():
                     if self.check_exit_event(event):
