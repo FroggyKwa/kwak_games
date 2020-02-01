@@ -297,7 +297,7 @@ class Game:
                     if event.type == pygame.KEYDOWN:
                         keys = pygame.key.get_pressed()
                         if keys[pygame.K_ESCAPE]:
-                            self.pause = False if self.pause else True
+                            self.pause = not self.pause
                     if self.pause:
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             self.Check_cursor_click_button(self.buttons_game_pause, event.pos)
@@ -332,7 +332,8 @@ class Game:
                         self.Check_cursor_on_button(self.buttons_game_not_pause, pygame.mouse.get_pos())
                 keys = pygame.key.get_pressed()
                 self.parse_data()
-                network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
+                if not self.pause:
+                    network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
                 try:
                     self.player.update(self.player.x, self.player.y)
                 except ValueError:
