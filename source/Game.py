@@ -94,7 +94,6 @@ class Game:
     def get_infinite_background():  # бесконечный background
         images['background'] = pygame.transform.scale(images['background'], (WIDTH, HEIGHT))
         img_rect = images['background'].get_rect()
-        print(img_rect)
         n_rows = round(HEIGHT / img_rect.height) + 1
         n_cols = round(WIDTH / img_rect.width) + 1
         temp_surface = pygame.Surface((n_cols * img_rect.width, n_rows * img_rect.height))
@@ -132,7 +131,6 @@ class Game:
     def check_exit_event(self, event):
         if event.type == pygame.QUIT:
             self.running = False
-            print('хоп хей лалалей')
         return not self.running
 
     def enter_ip_address(self, event):
@@ -145,10 +143,8 @@ class Game:
                 self.sockOut = network.connect_OutSocket(address=self.ip.split(':')[0], port=int(self.ip.split(':')[1]))
             except network.socket.gaierror:
                 self.msg_text = 'Сервер отключен или не сущесвует'
-                print(traceback.format_exc())
             except (IndexError, ValueError):
                 self.msg_text = 'IP указан неккоректно'
-                print(traceback.format_exc())
             else:
                 network.sock_send(self.sockOut, '1')
                 data, address = network.read_sock(self.sockIn)  # todo: если сервер не включен то виснет, исправить
@@ -162,7 +158,6 @@ class Game:
                 elif data == '3':
                     self.msg_text = 'Сервер уже заполнен!'
         self.ip = self.ip + event.unicode if event.unicode.isprintable() else self.ip
-        print(event.unicode, event.key, event.mod)
         print(self.ip)
 
     def render_ip_text(self, ip):
@@ -191,7 +186,6 @@ class Game:
     def parse_data(self):
         if self.messages:
             data = self.messages[0][0].split()
-            print(data)
             self.player.x, self.player.y, self.hp, self.player.direction, self.player.state = int(
                 float(data.pop(0))), int(float(data.pop(0))), int(
                 data.pop(0)), data.pop(0), data.pop(0)  # todo:мусор
@@ -322,10 +316,7 @@ class Game:
         while self.running:
             if self.state == 1:  # отрисовка меню
                 for event in pygame.event.get():
-                    print(event)
-                    print(self.check_exit_event(event))
                     self.menu(event)
-                    print(self.running)
             if self.state == 2:  # ввод IP
                 for event in pygame.event.get():
                     self.check_exit_event(event)
@@ -347,10 +338,8 @@ class Game:
                         if event.type == pygame.MOUSEBUTTONUP:
                             x, y = event.pos
                             for i in self.buttons_game_pause:
-                                print(0)
                                 if button.Button.check_cursor_release_button(i, x, y):
                                     name_button = button.Button.get_name(i)
-                                    print(0, name_button)
                                     if name_button == "Return to menu":
                                         network.sock_send(self.sockOut, '0')
                                         self.state = 1
@@ -362,10 +351,8 @@ class Game:
                         if event.type == pygame.MOUSEBUTTONUP:
                             x, y = event.pos
                             for i in self.buttons_game_not_pause:
-                                print(0)
                                 if button.Button.check_cursor_release_button(i, x, y):
                                     name_button = button.Button.get_name(i)
-                                    print(0, name_button)
                                     if name_button == "II":
                                         self.pause = True
                 else:
