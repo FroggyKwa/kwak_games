@@ -257,6 +257,15 @@ class Game:
         else:
             self.check_cursor_on_button(self.buttons_training, pygame.mouse.get_pos())
 
+    def gameover(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
+            self.state = 1
+        screen.fill((0, 0, 0))
+        font = pygame.font.Font(None, 70)
+        text = font.render("GAME OVER", 0, self.magenta)
+        text_x = WIDTH // 2 - text.get_width() // 2
+        screen.blit(text, (text_x, 150))
+
     def draw(self):
         self.camera.update(self.player)
         if self.timestamp <= 70:
@@ -366,6 +375,10 @@ class Game:
                     self.player.update(self.player.x, self.player.y)
                 except ValueError:
                     continue
+                if self.hp <= 0:
+                    self.state = 7
+                    network.sock_send(self.sockOut, '0')
+                    network.close_sock(self.sockOut)
                 self.draw()
             if self.state == 4:  # авторы
                 for event in pygame.event.get():
@@ -385,6 +398,12 @@ class Game:
                     self.training(event)
                 screen.blit(self.bg_menu, (0, 0))
                 self.draw_buttons(self.buttons_training)
+
+            if self.state == 7:  # Game over
+                for event in pygame.event.get():
+                    self.gameover(event)
+
+
 
             pygame.display.flip()
             cl.tick(FPS)
