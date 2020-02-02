@@ -2,7 +2,7 @@ import pygame
 from source import *
 
 JUMP_POWER = 20
-GRAVITY = 0.5
+GRAVITY = 0.7
 MOVE_SPEED = 5
 IMAGE_PATH = '../resources/player/'
 
@@ -67,7 +67,6 @@ class Player(pygame.sprite.Sprite):
         for i in group:
             if pygame.sprite.collide_mask(self, i):
                 spr = i
-                #print('Коллизия\n' * 10)
                 break
         if spr is not None:
             self.y = spr.rect.y - self.rect.height + 3
@@ -75,7 +74,6 @@ class Player(pygame.sprite.Sprite):
         else:
             self.onGround = False
         self.update(self.x, self.y)
-        #print(self.rect.x, self.rect.y, self.rect.height)
         self.x = self.x + self.x_velocity
 
     def get_damage(self, dmg):

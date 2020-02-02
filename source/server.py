@@ -1,8 +1,9 @@
+import time
+import pygame
 from source.network import connect_InSocket, connect_OutSocket, read_sock, sock_send, close_sock
 from source.player import Player
 from socket import gethostname, gethostbyname
 from source.instances import *
-import time, pygame
 from source.get_platforms import *
 
 sockIn = connect_InSocket(address='0.0.0.0')
@@ -40,45 +41,47 @@ while running:
     elif data.startswith('2'):
         player = players[address]
         keys = tuple(map(int, list(data.split()[1])))
+        if not (keys[119] or keys[32] or keys[97] or keys[100]):
+            player.change_velocity()
+            if player.onGround:
+                player.state = 'idle'
+            player.shooting = False
         if keys[119] or keys[32]:
             player.change_velocity(direction='up')
             player.state = 'jump'
-        if keys[97]:
-            player.change_velocity(direction='left')
-            player.direction = 'left'
-            if not player.state == 'jump':
-                player.state = 'run'
-        if keys[100]:
-            player.change_velocity(direction='right')
-            player.direction = 'right'
-            if not player.state == 'jump':
-                player.state = 'run'
+            player.shooting = False
         if keys[275]:
             player.direction = 'right'
             player.shooting = True
             if player.onGround:
-                if player.state == 'run' and not player.onGround:
-                    player.state = 'run-shoot'
-                else:
-                    player.state = 'shoot'
+                player.state = 'shoot'
             if not player.cur_shoot_time:
-                bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'right', player))
+                bullets.add(Bullet(screen, player.x + 10, player.y + 10, 'right', player))
                 player.cur_shoot_time = 30
         if keys[276]:
             player.direction = 'left'
             player.shooting = True
             if player.onGround:
-                if player.state == 'run':
-                    player.state = 'run-shoot'
-                else:
-                    player.state = 'shoot'
+                player.state = 'shoot'
             if not player.cur_shoot_time:
                 bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'left', player))
                 player.cur_shoot_time = 30
-        if not (keys[119] or keys[32] or keys[97] or keys[100]):
-            player.change_velocity()
-            if player.onGround:
-                player.state = 'idle'
+        if keys[97]:
+            player.change_velocity(direction='left')
+            player.direction = 'left'
+            if not player.state == 'jump':
+                if not player.shooting:
+                    player.state = 'run'
+                else:
+                    player.state = 'run-shoot'
+        if keys[100]:
+            player.change_velocity(direction='right')
+            player.direction = 'right'
+            if not player.state == 'jump':
+                if not player.shooting:
+                    player.state = 'run'
+                else:
+                    player.state = 'run-shoot'
     for i in players.values():
         if i.cur_shoot_time:
             i.cur_shoot_time -= 1
@@ -100,7 +103,7 @@ while running:
             # пульки движутся со скоростью 200 пикселей в секунду
             pass
             # bullets = list(map(lambda b: [b[0] + 20, b[1], b[2], b[3]], bullets))
-        #if time.time() - cur_time >= 0.001:
+        # if time.time() - cur_time >= 0.001:
         for p in players.values():
             p.move(platforms)
             for i in bullets:
