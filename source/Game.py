@@ -18,7 +18,7 @@ WIDTH, HEIGHT = 1280, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 cl = pygame.time.Clock()
 FPS = 60
-w_b, h_b = WIDTH // 3, HEIGHT // 15  # size of buttons
+
 
 class Game:
     def __init__(self):
@@ -36,23 +36,23 @@ class Game:
         self.timestamp = 0
 
     def init_buttons(self):
+        self.w_button, self.h_button = WIDTH // 3, HEIGHT // 15
         self.sounds_is_on = True
         self.pause = False
-        self.buttons_game_pause = [button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.3), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Continue"),
-                                   button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.4), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-        self.buttons_game_not_pause = [button.Button(h_b, h_b, WIDTH // 2 - (h_b // 2), int(HEIGHT * 0.01), (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
+        self.buttons_game_pause = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.3), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Continue"),
+                                   button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.4), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+        self.buttons_game_not_pause = [button.Button(self.h_button, self.h_button, WIDTH // 2 - (self.h_button // 2), int(HEIGHT * 0.01), (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
         self.buttons_menu = [
-            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.2), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
-            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.30625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
-            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.40625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
-            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.5125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings"),
-            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.6125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Quit game")]
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.2), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.30625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.40625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.5125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.6125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Quit game")]
         self.bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
-        self.buttons_authors = [button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-        self.buttons_training = [button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-        self.buttons_settings = [button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu"),
-                                 button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.25), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Turn off sounds")]
-        self.w_button, self.h_button = WIDTH // 3, HEIGHT // 15
+        self.buttons_authors = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+        self.buttons_training = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
+        self.buttons_settings = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu"),
+                                 button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.25), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Turn off sounds")]
         self.buttons_game_pause = [
             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.3), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Continue"),
             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.4), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
