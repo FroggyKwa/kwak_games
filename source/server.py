@@ -18,6 +18,8 @@ players = dict()
 bullets = pygame.sprite.Group()
 platforms = pygame.sprite.Group()
 get_platforms(screen, platforms)
+players['111'] = Player(300, 100)
+players['222'] = Player(300, 100)
 while running:
     data, address = read_sock(sockIn)
     if data == '1':
@@ -39,6 +41,7 @@ while running:
         if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False
     elif data.startswith('2'):
+        print(players)
         player = players[address]
         keys = tuple(map(int, list(data.split()[1])))
         if not (keys[119] or keys[32] or keys[97] or keys[100]):
@@ -91,7 +94,7 @@ while running:
         bullets_str = str(len(bullets)) + ' ' + \
                       ' '.join([str(i.rect.x) + ' ' + str(i.rect.y) for i in bullets])
         players_str = str(len(p) - 1) + ' ' + \
-                      ' '.join([str(i.x) + ' ' + str(i.y) + ' ' + i.direction
+                      ' '.join([str(i.rect.x) + ' ' + str(i.rect.y) + ' ' + i.direction
                                 for i in p.values() if i != p[addr]])
         reply = f'{x} {y} {hp} {d} {state} {bullets_str} {players_str}'
         if time.time() - cur_time >= 0.001:

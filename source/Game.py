@@ -194,6 +194,7 @@ class Game:
             for i in range(int(data.pop(0))):  # todo:мусор
                 self.enemies.append((int(data.pop(0)), int(data.pop(0)), data.pop(0)))
             self.messages.clear()
+            print(self.enemies)
 
     def authors(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
