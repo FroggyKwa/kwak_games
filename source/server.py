@@ -17,10 +17,9 @@ players = dict()
 bullets = pygame.sprite.Group()
 platforms = pygame.sprite.Group()
 get_platforms(screen, platforms)
+print(platforms)
 while running:
     data, address = read_sock(sockIn)
-    print(data, type(data))
-    print(address)
     if data == '1':
         if address in clients.keys():
             sock_send(clients[address], '2')
@@ -47,7 +46,6 @@ while running:
     elif data.startswith('2'):
         player = players[address]
         keys = tuple(map(int, list(data.split()[1])))
-        print(keys)
         if keys[119] or keys[32]:
             player.change_velocity(direction='up')
             player.state = 'jump'
@@ -86,7 +84,6 @@ while running:
             if player.onGround:
                 player.state = 'idle'
     for i in players.values():
-        print(i, players)
         if i.cur_shoot_time:
             i.cur_shoot_time -= 1
     for addr in players.keys():

@@ -24,8 +24,8 @@ def get_platforms(screen, group, name_of_map="../resources/maps/map.tmx"):
         for x, y, gid in layer:
             if gid != 0:
                 img = gameMap.get_tile_image_by_gid(gid)
-            try:
-                Platform(screen, x * gameMap.tilewidth, y * gameMap.tileheight, img, group)
-            except:
-                continue
+                try:
+                    Platform(screen, x * gameMap.tilewidth, y * gameMap.tileheight, img, group)
+                except:
+                    continue
     return surface

@@ -57,25 +57,31 @@ class Player(pygame.sprite.Sprite):
     def move(self, group):
         x, y = self.x, self.y
         self.y = self.y + self.y_velocity
-        self.update(x, y)
+        self.update(self.x, self.y)
         spr = None
         for i in group:
             if pygame.sprite.collide_mask(self, i):
                 spr = i
+                print('Коллизия\n' * 10)
                 break
         if spr is not None:
             self.rect.y = y
             self.onGround = True
             print(self.rect.x, self.rect.y)
+        self.update(self.x, self.y)
         self.x = self.x + self.x_velocity
-        self.update(x, y)
+        self.update(self.x, self.y)
         for i in group:
             if pygame.sprite.collide_mask(self, i):
                 spr = i
+                print('Коллизия\n' * 10)
                 break
         if spr is not None:
             self.rect.x = x
             print(self.rect.x, self.rect.y)
+        print(self.rect.x, self.rect.y)
+        self.update(self.x, self.y)
+
 
     def get_damage(self, dmg):
         self.hp -= dmg if self.hp >= dmg else self.hp
