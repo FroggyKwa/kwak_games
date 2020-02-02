@@ -82,7 +82,8 @@ class Game:
         self.sockIn = network.connect_InSocket(address='0.0.0.0', port=5556)
 
     def init_game(self):
-        t1 = Thread(target=network.read_server_sock, args=(self.sockIn, self.messages, self.running))
+        network.alive = True
+        t1 = Thread(target=network.read_server_sock, args=(self.sockIn, self.messages))
         t1.start()
         self.platforms = get_platforms_surface()
         self.player = Player(100, 100)
@@ -122,6 +123,7 @@ class Game:
                         self.state = 5
                     if name_button == "Quit game":
                         self.running = False
+                        network.alive = False
         else:
             self.check_cursor_on_button(self.buttons_menu, pygame.mouse.get_pos())
         screen.blit(self.bg_menu, (0, 0))
@@ -394,11 +396,15 @@ class Game:
                     self.training(event)
             pygame.display.flip()
             cl.tick(FPS)
-        self.t1.join()
-        network.close_sock(self.sockIn)
-        network.close_sock(self.sockOut)
-        pygame.quit()
-
+        try:
+            network.alive = False
+            network.close_sock(self.sockIn)
+            network.close_sock(self.sockOut)
+            pygame.quit()
+        except AttributeError:
+            pass
+        finally:
+            print('GoodBye')
 
 
 game = Game()

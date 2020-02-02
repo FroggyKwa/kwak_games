@@ -62,20 +62,22 @@ while running:
         if keys[275]:
             player.direction = 'right'
             player.shooting = True
-            if player.state == 'run':
-                player.state = 'run-shoot'
-            else:
-                player.state = 'shoot'
+            if player.onGround:
+                if player.state == 'run' and not player.onGround:
+                    player.state = 'run-shoot'
+                else:
+                    player.state = 'shoot'
             if not player.cur_shoot_time:
                 bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'right', player))
                 player.cur_shoot_time = 30
         if keys[276]:
             player.direction = 'left'
             player.shooting = True
-            if player.state == 'run':
-                player.state = 'run-shoot'
-            else:
-                player.state = 'shoot'
+            if player.onGround:
+                if player.state == 'run':
+                    player.state = 'run-shoot'
+                else:
+                    player.state = 'shoot'
             if not player.cur_shoot_time:
                 bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'left', player))
                 player.cur_shoot_time = 30
