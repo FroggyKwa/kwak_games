@@ -31,13 +31,13 @@ while running:
             clients[address] = connect_OutSocket(address=address[0], port=5556)
             players[address] = Player(100, 100, socket=clients[address])
             sock_send(clients[address], '1')
+            print(clients)
     elif data == '0':
         sock = clients.pop(address)
         sock_send(sock, '0')
         close_sock(sock)
         if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False
-        print(clients)
     elif data.startswith('2'):
         player = players[address]
         keys = tuple(map(int, list(data.split()[1])))
