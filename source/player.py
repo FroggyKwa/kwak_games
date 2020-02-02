@@ -13,8 +13,10 @@ class Player(pygame.sprite.Sprite):
         self.cnt = 1
         self.direction = 'right'
         self.state = 'idle'  # состояние героя, изменяется на сервере
+        self.x = x0
+        self.y = y0
         self.cur_image = 0
-        self.image = self.change_image()
+        self.change_image()
         self.rect = self.image.get_rect() if self.image else pygame.Surface((20, 30)).get_rect()
         self.update(x0, y0)
         self.x_velocity = 0
@@ -38,7 +40,9 @@ class Player(pygame.sprite.Sprite):
         image = pygame.image.load(IMAGE_PATH + f'{self.state}/{self.state}-{self.cur_image}.png').convert_alpha()
         if self.direction == 'left':
             image = pygame.transform.flip(image, True, False)
-        return image
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.update(self.x, self.y)
 
     def change_velocity(self, direction=None):
         if not direction:
@@ -57,34 +61,22 @@ class Player(pygame.sprite.Sprite):
             self.y_velocity = 0
 
     def move(self, group):
-        x, y = self.x, self.y
         self.y = self.y + self.y_velocity
         self.update(self.x, self.y)
         spr = None
         for i in group:
             if pygame.sprite.collide_mask(self, i):
                 spr = i
-                print('Коллизия\n' * 10)
+                #print('Коллизия\n' * 10)
                 break
         if spr is not None:
-            self.y = spr.rect.y - self.rect.height + 1
+            self.y = spr.rect.y - self.rect.height + 3
             self.onGround = True
-            print(self.rect.x, self.rect.y)
         else:
             self.onGround = False
         self.update(self.x, self.y)
+        #print(self.rect.x, self.rect.y, self.rect.height)
         self.x = self.x + self.x_velocity
-        self.update(self.x, self.y)
-        for i in group:
-            if pygame.sprite.collide_mask(self, i):
-                spr = i
-                print('Коллизия\n' * 10)
-                break
-        if spr is not None:
-            self.rect.x = x
-            print(self.rect.x, self.rect.y)
-        print(self.rect.x, self.rect.y)
-        self.update(self.x, self.y)
 
     def get_damage(self, dmg):
         self.hp -= dmg if self.hp >= dmg else self.hp

@@ -104,11 +104,15 @@ while running:
                 pass
         if time.time() - cur_time >= 0.1:
             # пульки движутся со скоростью 200 пикселей в секунду
+            pass
+            # bullets = list(map(lambda b: [b[0] + 20, b[1], b[2], b[3]], bullets))
+        #if time.time() - cur_time >= 0.001:
+        for p in players.values():
+            p.move(platforms)
             for i in bullets:
                 i.move()
-            # bullets = list(map(lambda b: [b[0] + 20, b[1], b[2], b[3]], bullets))
-        if time.time() - cur_time >= 0.001:
-            for p in players.values():
-                p.move(platforms)
+                if pygame.sprite.collide_mask(i, p) and i.owner != p:
+                    i.kill()
+                    p.get_damage(20)
 
 close_sock(sockIn)

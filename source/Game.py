@@ -272,7 +272,7 @@ class Game:
             self.timestamp += cl.get_time()
         else:
             self.timestamp = 0
-            self.player.image = self.player.change_image()
+            self.player.change_image()
         screen.blit(self.background, self.background.get_rect())
         screen.blit(self.platforms, self.camera.apply_rect(self.platforms.get_rect()))
         screen.blit(self.player.image, self.camera.apply(self.player))
