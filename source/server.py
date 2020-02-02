@@ -15,9 +15,8 @@ cur_time = time.time()
 clients = dict()
 players = dict()
 bullets = pygame.sprite.Group()
-platforms = pygame.sprite.Group()
+platforms = list()
 get_platforms(screen, platforms)
-#print(platforms)
 while running:
     data, address = read_sock(sockIn)
     print(data, type(data))
@@ -25,7 +24,7 @@ while running:
     if data == '1':
         if address in clients.keys():
             sock_send(clients[address], '2')
-            print('request de`nied: 2')
+            print('request denied: 2')
         elif len(clients.values()) >= 4:
             sock = connect_OutSocket(address=address[0], port=5556)
             sock_send(sock, '3')
@@ -62,10 +61,6 @@ while running:
             player.direction = 'right'
             if not player.state == 'jump':
                 player.state = 'run'
-        if not (keys[119] or keys[32] or keys[97] or keys[100]):
-            player.change_velocity()
-            if player.onGround:
-                player.state = 'idle'
         if keys[275]:
             player.direction = 'right'
             player.shooting = True
@@ -86,6 +81,10 @@ while running:
             if not player.cur_shoot_time:
                 bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'left'))
                 player.cur_shoot_time = 30
+        if not (keys[119] or keys[32] or keys[97] or keys[100]):
+            player.change_velocity()
+            if player.onGround:
+                player.state = 'idle'
     for i in players.values():
         print(i, players)
         if i.cur_shoot_time:

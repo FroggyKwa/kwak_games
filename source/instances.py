@@ -12,18 +12,18 @@ class Platform(Entity):
     def __init__(self, screen, x, y, filename, *groups):
         super().__init__(screen, groups)
         self.cnt = 1
-        self.image = filename if filename is not str\
+        self.image = filename if filename is not str \
             else pygame.image.load(filename).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
-        print(self.rect)
 
 
 class Bullet(Entity):
     def __init__(self, screen, x, y, dir):
         super().__init__(screen)
         self.cnt = 1
-        self.image = pygame.image.load('../source/resources/warped city files/SPRITES/misc/shot/shot-1.png').convert_alpha()
+        self.image = pygame.image.load(
+            '../source/resources/warped city files/SPRITES/misc/shot/shot-1.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
         self.lifespan = 180
@@ -37,4 +37,4 @@ class Bullet(Entity):
         self.screen.blit(self.image, self.rect)
         if not self.lifespan:
             self.kill()
-#b = Bullet(pygame.display.set_mode((1280, 800)), 0, 0, 'тебе ли не пофиг куда ты смотришь')
+# b = Bullet(pygame.display.set_mode((1280, 800)), 0, 0, 'тебе ли не пофиг куда ты смотришь')

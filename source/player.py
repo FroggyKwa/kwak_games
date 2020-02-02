@@ -8,14 +8,13 @@ IMAGE_PATH = '../resources/player/'
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x0, y0, socket=None, screen=None, *groups):
+    def __init__(self, x0, y0, socket=None, *groups):
         super().__init__(*groups)
-        self.screen = screen
         self.cnt = 1
         self.direction = 'right'
         self.state = 'idle'  # состояние героя, изменяется на сервере
         self.cur_image = 0
-        self.image = self.change_image() if self.screen else None
+        self.image = self.change_image()
         self.rect = self.image.get_rect() if self.image else pygame.Surface((20, 30)).get_rect()
         self.update(x0, y0)
         self.x_velocity = 0
@@ -23,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.ip = None
         self.sock = socket
         self.hp = 100
-        self.onGround = True
+        self.onGround = False
         self.shooting = False
         self.cur_shoot_time = 0
 
@@ -36,8 +35,7 @@ class Player(pygame.sprite.Sprite):
     def change_image(self):
         self.cur_image %= count_sprites[self.state]
         self.cur_image += 1
-        image = pygame.image.load(IMAGE_PATH + f'{self.state}/{self.state}-{self.cur_image}.png').convert_alpha(
-            self.screen)
+        image = pygame.image.load(IMAGE_PATH + f'{self.state}/{self.state}-{self.cur_image}.png').convert_alpha()
         if self.direction == 'left':
             image = pygame.transform.flip(image, True, False)
         return image
@@ -78,7 +76,6 @@ class Player(pygame.sprite.Sprite):
         if spr is not None:
             self.rect.x = x
             print(self.rect.x, self.rect.y)
-
 
     def get_damage(self, dmg):
         self.hp -= dmg if self.hp >= dmg else self.hp

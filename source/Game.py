@@ -18,6 +18,7 @@ WIDTH, HEIGHT = 1280, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 cl = pygame.time.Clock()
 FPS = 60
+w_b, h_b = WIDTH // 3, HEIGHT // 15  # size of buttons
 
 
 class Game:
@@ -36,27 +37,48 @@ class Game:
         self.timestamp = 0
 
     def init_buttons(self):
-        self.w_button, self.h_button = WIDTH // 3, HEIGHT // 15
         self.sounds_is_on = True
         self.pause = False
-        self.buttons_game_pause = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.3), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Continue"),
-                                   button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.4), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-        self.buttons_game_not_pause = [button.Button(self.h_button, self.h_button, WIDTH // 2 - (self.h_button // 2), int(HEIGHT * 0.01), (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
-        self.buttons_menu = [
-            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.2), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
-            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.30625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
-            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.40625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
-            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.5125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings"),
-            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.6125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Quit game")]
-        self.bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
-        self.buttons_authors = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-        self.buttons_training = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-        self.buttons_settings = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu"),
-                                 button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.25), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Turn off sounds")]
         self.buttons_game_pause = [
-            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.3), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Continue"),
-            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.4), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Return to menu")]
-        self.buttons_game_not_pause = [button.Button(self.h_button, self.h_button, WIDTH // 2 - (self.h_button // 2), int(HEIGHT * 0.01), (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.3), (5, 5, 5), (15, 15, 15), (25, 25, 25),
+                          "Continue"),
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.4), (5, 5, 5), (15, 15, 15), (25, 25, 25),
+                          "Return to menu")]
+        self.buttons_game_not_pause = [
+            button.Button(h_b, h_b, WIDTH // 2 - (h_b // 2), int(HEIGHT * 0.01), (5, 5, 5), (15, 15, 15), (25, 25, 25),
+                          "II")]
+        self.buttons_menu = [
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.2), (5, 5, 5), (15, 15, 15), (25, 25, 25),
+                          "Join server"),
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.30625), (5, 5, 5), (15, 15, 15),
+                          (25, 25, 25), "Authors"),
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.40625), (5, 5, 5), (15, 15, 15),
+                          (25, 25, 25), "Training"),
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.5125), (5, 5, 5), (15, 15, 15),
+                          (25, 25, 25), "Settings"),
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.6125), (5, 5, 5), (15, 15, 15),
+                          (25, 25, 25), "Quit game")]
+        self.bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
+        self.buttons_authors = [
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25),
+                          "Return to menu")]
+        self.buttons_training = [
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25),
+                          "Return to menu")]
+        self.buttons_settings = [
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.9), (5, 5, 5), (15, 15, 15), (25, 25, 25),
+                          "Return to menu"),
+            button.Button(w_b, h_b, WIDTH // 2 - (w_b // 2), int(HEIGHT * 0.25), (5, 5, 5), (15, 15, 15), (25, 25, 25),
+                          "Turn off sounds")]
+        self.w_button, self.h_button = WIDTH // 3, HEIGHT // 15
+        self.buttons_game_pause = [
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.3), (5, 5, 5),
+                          (15, 15, 15), (25, 25, 25), "Continue"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.4), (5, 5, 5),
+                          (15, 15, 15), (25, 25, 25), "Return to menu")]
+        self.buttons_game_not_pause = [
+            button.Button(self.h_button, self.h_button, WIDTH // 2 - (self.h_button // 2), int(HEIGHT * 0.01),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
         self.magenta = (200, 0, 255)
 
     def init_joining_server(self):
@@ -69,7 +91,7 @@ class Game:
         t1 = Thread(target=network.read_server_sock, args=(self.sockIn, self.messages, self.running))
         t1.start()
         self.platforms = get_platforms_surface()
-        self.player = Player(100, 100, screen=screen)
+        self.player = Player(100, 100)
         self.bullets = list()  # todo:мусор
         self.enemies = list()  # todo:мусор
 
@@ -90,7 +112,7 @@ class Game:
 
     def menu(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            self.Check_cursor_click_button(self.buttons_menu, event.pos)
+            self.check_cursor_click_button(self.buttons_menu, event.pos)
         if event.type == pygame.MOUSEBUTTONUP:
             x, y = event.pos
             for i in self.buttons_menu:
@@ -105,7 +127,7 @@ class Game:
                     if name_button == "Settings":
                         self.state = 5
         else:
-            self.Check_cursor_on_button(self.buttons_menu, pygame.mouse.get_pos())
+            self.check_cursor_on_button(self.buttons_menu, pygame.mouse.get_pos())
         screen.blit(self.bg_menu, (0, 0))
         self.draw_buttons(self.buttons_menu)
 
@@ -172,7 +194,8 @@ class Game:
         if self.messages:
             data = self.messages[0][0].split()
             print(data)
-            self.player.x, self.player.y, self.hp, self.player.direction, self.player.state = int(float(data.pop(0))), int(float(data.pop(0))), int(
+            self.player.x, self.player.y, self.hp, self.player.direction, self.player.state = int(
+                float(data.pop(0))), int(float(data.pop(0))), int(
                 data.pop(0)), data.pop(0), data.pop(0)  # todo:мусор
             self.bullets = list()
             for i in range(int(data.pop(0))):  # todo:мусор
@@ -183,7 +206,7 @@ class Game:
 
     def authors(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            self.Check_cursor_click_button(self.buttons_authors, event.pos)
+            self.check_cursor_click_button(self.buttons_authors, event.pos)
         if event.type == pygame.MOUSEBUTTONUP:
             x, y = event.pos
             for i in self.buttons_authors:
@@ -192,7 +215,7 @@ class Game:
                     if name_button == "Return to menu":
                         self.state = 1
         else:
-            self.Check_cursor_on_button(self.buttons_authors, pygame.mouse.get_pos())
+            self.check_cursor_on_button(self.buttons_authors, pygame.mouse.get_pos())
         screen.blit(self.bg_menu, (0, 0))
         font = pygame.font.Font(None, 70)
         text = font.render("Authors:", 0, self.magenta)
@@ -211,7 +234,7 @@ class Game:
 
     def settings(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            self.Check_cursor_click_button(self.buttons_settings, event.pos)
+            self.check_cursor_click_button(self.buttons_settings, event.pos)
         if event.type == pygame.MOUSEBUTTONUP:
             x, y = event.pos
             for i in self.buttons_settings:
@@ -226,13 +249,13 @@ class Game:
                         self.sounds_is_on = True
                         button.Button.change_name(i, "Turn off sounds")
         else:
-            self.Check_cursor_on_button(self.buttons_settings, pygame.mouse.get_pos())
+            self.check_cursor_on_button(self.buttons_settings, pygame.mouse.get_pos())
         screen.blit(self.bg_menu, (0, 0))
         self.draw_buttons(self.buttons_settings)
 
     def training(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            self.Check_cursor_click_button(self.buttons_training, event.pos)
+            self.check_cursor_click_button(self.buttons_training, event.pos)
         if event.type == pygame.MOUSEBUTTONUP:
             x, y = event.pos
             for i in self.buttons_training:
@@ -241,7 +264,7 @@ class Game:
                     if name_button == "Return to menu":
                         self.state = 1
         else:
-            self.Check_cursor_on_button(self.buttons_training, pygame.mouse.get_pos())
+            self.check_cursor_on_button(self.buttons_training, pygame.mouse.get_pos())
         screen.blit(self.bg_menu, (0, 0))
         self.draw_buttons(self.buttons_training)
 
@@ -275,6 +298,28 @@ class Game:
         else:
             self.draw_buttons(self.buttons_game_not_pause)
 
+    def draw_buttons(self, buttons):
+        for i in buttons:
+            x, y, b_width, b_height, color, name_button = i.draw()
+            pygame.draw.rect(screen, color, (x, y, b_width, b_height))
+            font = pygame.font.Font(None, 70)
+            text = font.render(button.Button.get_name(i), 0, self.magenta)
+            text_x = x + b_width // 2 - text.get_width() // 2
+            text_y = y + b_height // 2 - text.get_height() // 2
+            screen.blit(text, (text_x, text_y))
+
+    def check_cursor_on_button(self, buttons, xy):
+        x, y = xy
+        for i in buttons:
+            if button.Button.check_cursor_on_button(i, x, y):
+                continue
+
+    def check_cursor_click_button(self, buttons, xy):
+        x, y = xy
+        for i in buttons:
+            if button.Button.check_cursor_click_button(i, x, y):
+                continue
+
     def run(self):
         while self.running:
             if self.state == 1:  # отрисовка меню
@@ -300,7 +345,7 @@ class Game:
                             self.pause = not self.pause
                     if self.pause:
                         if event.type == pygame.MOUSEBUTTONDOWN:
-                            self.Check_cursor_click_button(self.buttons_game_pause, event.pos)
+                            self.check_cursor_click_button(self.buttons_game_pause, event.pos)
                         if event.type == pygame.MOUSEBUTTONUP:
                             x, y = event.pos
                             for i in self.buttons_game_pause:
@@ -315,7 +360,7 @@ class Game:
                                         self.pause = False
                     else:
                         if event.type == pygame.MOUSEBUTTONDOWN:
-                            self.Check_cursor_click_button(self.buttons_game_not_pause, event.pos)
+                            self.check_cursor_click_button(self.buttons_game_not_pause, event.pos)
                         if event.type == pygame.MOUSEBUTTONUP:
                             x, y = event.pos
                             for i in self.buttons_game_not_pause:
@@ -327,9 +372,9 @@ class Game:
                                         self.pause = True
                 else:
                     if self.pause:
-                        self.Check_cursor_on_button(self.buttons_game_pause, pygame.mouse.get_pos())
+                        self.check_cursor_on_button(self.buttons_game_pause, pygame.mouse.get_pos())
                     else:
-                        self.Check_cursor_on_button(self.buttons_game_not_pause, pygame.mouse.get_pos())
+                        self.check_cursor_on_button(self.buttons_game_not_pause, pygame.mouse.get_pos())
                 keys = pygame.key.get_pressed()
                 self.parse_data()
                 if not self.pause:
@@ -358,27 +403,6 @@ class Game:
         network.close_sock(self.sockOut)
         pygame.quit()
 
-    def draw_buttons(self, buttons):
-        for i in buttons:
-            x, y, b_width, b_height, color, name_button = i.draw()
-            pygame.draw.rect(screen, color, (x, y, b_width, b_height))
-            font = pygame.font.Font(None, 70)
-            text = font.render(button.Button.get_name(i), 0, self.magenta)
-            text_x = x + b_width // 2 - text.get_width() // 2
-            text_y = y + b_height // 2 - text.get_height() // 2
-            screen.blit(text, (text_x, text_y))
-
-    def Check_cursor_on_button(self, buttons, xy):
-        x, y = xy
-        for i in buttons:
-            if button.Button.check_cursor_on_button(i, x, y):
-                continue
-
-    def Check_cursor_click_button(self, buttons, xy):
-        x, y = xy
-        for i in buttons:
-            if button.Button.check_cursor_click_button(i, x, y):
-                continue
 
 
 game = Game()
