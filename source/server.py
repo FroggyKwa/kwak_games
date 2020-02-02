@@ -17,28 +17,22 @@ players = dict()
 bullets = pygame.sprite.Group()
 platforms = pygame.sprite.Group()
 get_platforms(screen, platforms)
-print(platforms)
 while running:
     data, address = read_sock(sockIn)
     if data == '1':
         if address in clients.keys():
             sock_send(clients[address], '2')
-            print('request denied: 2')
         elif len(clients.values()) >= 4:
             sock = connect_OutSocket(address=address[0], port=5556)
             sock_send(sock, '3')
             sock.close()
-            print('request denied: 3')
         else:
             clients[address] = connect_OutSocket(address=address[0], port=5556)
             players[address] = Player(100, 100, socket=clients[address])
             sock_send(clients[address], '1')
-            print('request accepted')
-        print(clients)
     elif data == '0':
         sock = clients.pop(address)
         sock_send(sock, '0')
-        print('client is disconnected')
         close_sock(sock)
         if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False

@@ -94,7 +94,6 @@ class Game:
     def get_infinite_background():  # бесконечный background
         images['background'] = pygame.transform.scale(images['background'], (WIDTH, HEIGHT))
         img_rect = images['background'].get_rect()
-        print(img_rect)
         n_rows = round(HEIGHT / img_rect.height) + 1
         n_cols = round(WIDTH / img_rect.width) + 1
         temp_surface = pygame.Surface((n_cols * img_rect.width, n_rows * img_rect.height))
@@ -126,13 +125,10 @@ class Game:
                         network.alive = False
         else:
             self.check_cursor_on_button(self.buttons_menu, pygame.mouse.get_pos())
-        screen.blit(self.bg_menu, (0, 0))
-        self.draw_buttons(self.buttons_menu)
 
     def check_exit_event(self, event):
         if event.type == pygame.QUIT:
             self.running = False
-            print('хоп хей лалалей')
         return not self.running
 
     def enter_ip_address(self, event):
@@ -145,10 +141,8 @@ class Game:
                 self.sockOut = network.connect_OutSocket(address=self.ip.split(':')[0], port=int(self.ip.split(':')[1]))
             except network.socket.gaierror:
                 self.msg_text = 'Сервер отключен или не сущесвует'
-                print(traceback.format_exc())
             except (IndexError, ValueError):
                 self.msg_text = 'IP указан неккоректно'
-                print(traceback.format_exc())
             else:
                 network.sock_send(self.sockOut, '1')
                 data, address = network.read_sock(self.sockIn)  # todo: если сервер не включен то виснет, исправить
@@ -162,7 +156,6 @@ class Game:
                 elif data == '3':
                     self.msg_text = 'Сервер уже заполнен!'
         self.ip = self.ip + event.unicode if event.unicode.isprintable() else self.ip
-        print(event.unicode, event.key, event.mod)
         print(self.ip)
 
     def render_ip_text(self, ip):
@@ -191,7 +184,6 @@ class Game:
     def parse_data(self):
         if self.messages:
             data = self.messages[0][0].split()
-            print(data)
             self.player.x, self.player.y, self.hp, self.player.direction, self.player.state = int(
                 float(data.pop(0))), int(float(data.pop(0))), int(
                 data.pop(0)), data.pop(0), data.pop(0)  # todo:мусор
@@ -214,6 +206,8 @@ class Game:
                         self.state = 1
         else:
             self.check_cursor_on_button(self.buttons_authors, pygame.mouse.get_pos())
+
+    def draw_authors(self):
         screen.blit(self.bg_menu, (0, 0))
         font = pygame.font.Font(None, 70)
         text = font.render("Authors:", 0, self.magenta)
@@ -248,8 +242,6 @@ class Game:
                         button.Button.change_name(i, "Turn off sounds")
         else:
             self.check_cursor_on_button(self.buttons_settings, pygame.mouse.get_pos())
-        screen.blit(self.bg_menu, (0, 0))
-        self.draw_buttons(self.buttons_settings)
 
     def training(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -263,8 +255,6 @@ class Game:
                         self.state = 1
         else:
             self.check_cursor_on_button(self.buttons_training, pygame.mouse.get_pos())
-        screen.blit(self.bg_menu, (0, 0))
-        self.draw_buttons(self.buttons_training)
 
     def draw(self):
         self.camera.update(self.player)
@@ -322,16 +312,15 @@ class Game:
         while self.running:
             if self.state == 1:  # отрисовка меню
                 for event in pygame.event.get():
-                    print(event)
-                    print(self.check_exit_event(event))
                     self.menu(event)
-                    print(self.running)
+                screen.blit(self.bg_menu, (0, 0))
+                self.draw_buttons(self.buttons_menu)
             if self.state == 2:  # ввод IP
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     if event.type == pygame.KEYDOWN:
                         self.enter_ip_address(event)
-                    self.render_ip_text(self.ip)
+                self.render_ip_text(self.ip)
             if self.state == 3:  # Игра
                 for event in pygame.event.get():
                     if self.check_exit_event(event):
@@ -347,10 +336,8 @@ class Game:
                         if event.type == pygame.MOUSEBUTTONUP:
                             x, y = event.pos
                             for i in self.buttons_game_pause:
-                                print(0)
                                 if button.Button.check_cursor_release_button(i, x, y):
                                     name_button = button.Button.get_name(i)
-                                    print(0, name_button)
                                     if name_button == "Return to menu":
                                         network.sock_send(self.sockOut, '0')
                                         self.state = 1
@@ -362,10 +349,8 @@ class Game:
                         if event.type == pygame.MOUSEBUTTONUP:
                             x, y = event.pos
                             for i in self.buttons_game_not_pause:
-                                print(0)
                                 if button.Button.check_cursor_release_button(i, x, y):
                                     name_button = button.Button.get_name(i)
-                                    print(0, name_button)
                                     if name_button == "II":
                                         self.pause = True
                 else:
@@ -386,14 +371,21 @@ class Game:
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     self.authors(event)
+                self.draw_authors()
             if self.state == 5:  # настройки
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     self.settings(event)
+                screen.blit(self.bg_menu, (0, 0))
+                self.draw_buttons(self.buttons_settings)
+
             if self.state == 6:
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     self.training(event)
+                screen.blit(self.bg_menu, (0, 0))
+                self.draw_buttons(self.buttons_training)
+
             pygame.display.flip()
             cl.tick(FPS)
         try:
