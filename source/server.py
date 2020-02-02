@@ -111,8 +111,10 @@ while running:
             p.move(platforms)
         for i in bullets:
             i.move()
-            if pygame.sprite.collide_mask(i, p) and i.owner != p:
-                i.kill()
-                p.get_damage(20)
+            for p in players.values():
+                if pygame.sprite.collide_mask(i, p) and i.owner != p:
+                    i.kill()
+                    p.get_damage(20)
+        print(*[i.hp for i in players.values()])
 
 close_sock(sockIn)
