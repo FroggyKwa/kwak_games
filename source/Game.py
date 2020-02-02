@@ -1,5 +1,3 @@
-import traceback
-
 import pygame
 from source import *
 from source import network
@@ -87,7 +85,7 @@ class Game:
         t1.start()
         self.platforms = get_platforms_surface()
         self.player = Player(100, 100)
-        self.bullets = list()  # todo:мусор
+        self.bullets = pygame.sprite.Group()  # todo:мусор
         self.enemies = list()  # todo:мусор
 
     @staticmethod
@@ -184,12 +182,15 @@ class Game:
     def parse_data(self):
         if self.messages:
             data = self.messages[0][0].split()
-            self.player.x, self.player.y, self.hp, self.player.direction, self.player.state = int(
-                float(data.pop(0))), int(float(data.pop(0))), int(
-                data.pop(0)), data.pop(0), data.pop(0)  # todo:мусор
-            self.bullets = list()
+            try:
+                self.player.x, self.player.y, self.hp, self.player.direction, self.player.state = int(
+                    float(data.pop(0))), int(float(data.pop(0))), int(
+                    data.pop(0)), data.pop(0), data.pop(0)  # todo:мусор
+                self.bullets = pygame.sprite.Group()
+            except IndexError:
+                pass
             for i in range(int(data.pop(0))):  # todo:мусор
-                self.bullets.append((int(float(data.pop(0))), int(float(data.pop(0)))))
+                self.bullets.add(Bullet(screen, int(float(data.pop(0))), int(float(data.pop(0)))))
             for i in range(int(data.pop(0))):  # todo:мусор
                 self.enemies.append((int(data.pop(0)), int(data.pop(0)), data.pop(0)))
             self.messages.clear()
@@ -216,7 +217,7 @@ class Game:
         text = font.render("Denis Bakushev", 0, self.magenta)
         text_x = WIDTH // 2 - text.get_width() // 2
         screen.blit(text, (text_x, 210))
-        text = font.render("Froggling Golovankov", 0, self.magenta)
+        text = font.render("Froggling", 0, self.magenta)
         text_x = WIDTH // 2 - text.get_width() // 2
         screen.blit(text, (text_x, 270))
         text = font.render("Pavel Rudnik", 0, self.magenta)
@@ -266,10 +267,9 @@ class Game:
         screen.blit(self.background, self.background.get_rect())
         screen.blit(self.platforms, self.camera.apply_rect(self.platforms.get_rect()))
         screen.blit(self.player.image, self.camera.apply(self.player))
-        for i in self.bullets:  # todo:мусор
-            bullet = pygame.Surface((10, 5))
-            bullet.fill((100, 100, 100))
-            screen.blit(bullet, (i[0], i[1]))
+        for bullet in self.bullets:
+            bullet.move()
+            screen.blit(bullet.image, bullet.rect)
         for i in self.enemies:  # todo:мусор
             enemy = pygame.Surface((30, 50))
             enemy.fill((255, 0, 0))

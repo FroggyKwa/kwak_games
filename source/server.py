@@ -56,7 +56,7 @@ while running:
             if player.onGround:
                 player.state = 'shoot'
             if not player.cur_shoot_time:
-                bullets.add(Bullet(screen, player.x + 10, player.y + 10, 'right', player))
+                bullets.add(Bullet(screen, player.x + 10, player.y + 10, direction='right', owner=player))
                 player.cur_shoot_time = 30
         if keys[276]:
             player.direction = 'left'
@@ -64,7 +64,7 @@ while running:
             if player.onGround:
                 player.state = 'shoot'
             if not player.cur_shoot_time:
-                bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'left', player))
+                bullets.add(Bullet(screen, player.x + 10, player.y + 10, direction='left', owner=player))
                 player.cur_shoot_time = 30
         if keys[97]:
             player.change_velocity(direction='left')
@@ -106,10 +106,10 @@ while running:
         # if time.time() - cur_time >= 0.001:
         for p in players.values():
             p.move(platforms)
-            for i in bullets:
-                i.move()
-                if pygame.sprite.collide_mask(i, p) and i.owner != p:
-                    i.kill()
-                    p.get_damage(20)
+        for i in bullets:
+            i.move()
+            if pygame.sprite.collide_mask(i, p) and i.owner != p:
+                i.kill()
+                p.get_damage(20)
 
 close_sock(sockIn)

@@ -19,23 +19,23 @@ class Platform(Entity):
 
 
 class Bullet(Entity):
-    def __init__(self, screen, x, y, dir, owner):
+    def __init__(self, screen, x, y, direction='right', owner=None):
         super().__init__(screen)
         self.cnt = 1
         self.owner = owner
         self.image = pygame.image.load(
-            '../source/resources/warped city files/SPRITES/misc/shot/shot-1.png').convert_alpha()
+            '../resources/misc/shot/shot-1.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
         self.lifespan = 180
-        self.direction = dir
+        self.direction = direction
 
     def move(self):
         self.rect.x += 20 if self.direction == 'right' else -20
         self.lifespan -= 1
         self.image = pygame.image.load(
-            f'../source/resources/warped city files/SPRITES/misc/shot/shot-{(self.cnt % 3) + 1}.png').convert_alpha()
+            f'../resources/misc/shot/shot-{(self.cnt % 3) + 1}.png').convert_alpha()
         self.screen.blit(self.image, self.rect)
+        self.cnt += 1
         if not self.lifespan:
             self.kill()
-# b = Bullet(pygame.display.set_mode((1280, 800)), 0, 0, 'тебе ли не пофиг куда ты смотришь')
