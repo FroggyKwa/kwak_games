@@ -67,7 +67,7 @@ class Player(pygame.sprite.Sprite):
                 print('Коллизия\n' * 10)
                 break
         if spr is not None:
-            self.rect.y = y
+            self.y = spr.rect.y - self.rect.height + 1
             self.onGround = True
             print(self.rect.x, self.rect.y)
         else:
