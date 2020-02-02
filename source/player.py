@@ -22,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.ip = None
         self.sock = socket
         self.hp = 100
-        self.onGround = False
+        self.onGround = True
         self.shooting = False
         self.cur_shoot_time = 0
 

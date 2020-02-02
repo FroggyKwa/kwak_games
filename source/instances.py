@@ -19,9 +19,10 @@ class Platform(Entity):
 
 
 class Bullet(Entity):
-    def __init__(self, screen, x, y, dir):
+    def __init__(self, screen, x, y, dir, owner):
         super().__init__(screen)
         self.cnt = 1
+        self.owner = owner
         self.image = pygame.image.load(
             '../source/resources/warped city files/SPRITES/misc/shot/shot-1.png').convert_alpha()
         self.rect = self.image.get_rect()

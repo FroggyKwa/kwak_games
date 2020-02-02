@@ -15,7 +15,7 @@ cur_time = time.time()
 clients = dict()
 players = dict()
 bullets = pygame.sprite.Group()
-platforms = list()
+platforms = pygame.sprite.Group()
 get_platforms(screen, platforms)
 while running:
     data, address = read_sock(sockIn)
@@ -69,7 +69,7 @@ while running:
             else:
                 player.state = 'shoot'
             if not player.cur_shoot_time:
-                bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'right'))
+                bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'right', player))
                 player.cur_shoot_time = 30
         if keys[276]:
             player.direction = 'left'
@@ -79,7 +79,7 @@ while running:
             else:
                 player.state = 'shoot'
             if not player.cur_shoot_time:
-                bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'left'))
+                bullets.add(Bullet(screen, player.x + 2, player.y + 2, 'left', player))
                 player.cur_shoot_time = 30
         if not (keys[119] or keys[32] or keys[97] or keys[100]):
             player.change_velocity()
