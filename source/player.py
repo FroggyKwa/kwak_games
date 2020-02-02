@@ -53,6 +53,8 @@ class Player(pygame.sprite.Sprite):
             self.x_velocity = MOVE_SPEED
         if not self.onGround:
             self.y_velocity += GRAVITY if self.y_velocity <= 5 else 0
+        else:
+            self.y_velocity = 0
 
     def move(self, group):
         x, y = self.x, self.y
@@ -68,6 +70,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.y = y
             self.onGround = True
             print(self.rect.x, self.rect.y)
+        else:
+            self.onGround = False
         self.update(self.x, self.y)
         self.x = self.x + self.x_velocity
         self.update(self.x, self.y)
@@ -81,7 +85,6 @@ class Player(pygame.sprite.Sprite):
             print(self.rect.x, self.rect.y)
         print(self.rect.x, self.rect.y)
         self.update(self.x, self.y)
-
 
     def get_damage(self, dmg):
         self.hp -= dmg if self.hp >= dmg else self.hp
