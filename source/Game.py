@@ -1,5 +1,6 @@
 import pygame
 import sys
+
 sys.path.append('../')
 from threading import Thread
 from source import *
@@ -47,11 +48,17 @@ class Game:
             button.Button(self.h_button, self.h_button, WIDTH // 2 - (self.h_button // 2), int(HEIGHT * 0.01),
                           (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
 
-        self.buttons_menu = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.2), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
-             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.30625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
-             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.40625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
-             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.5125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings"),
-             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.6125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Quit game")]
+        self.buttons_menu = [
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.2), (5, 5, 5),
+                          (15, 15, 15), (25, 25, 25), "Join server"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.30625),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.40625),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.5125),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.6125),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "Quit game")]
         self.bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
         self.buttons_authors = [
             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.9), (5, 5, 5),
@@ -86,8 +93,7 @@ class Game:
         t1.start()
         self.platforms = get_platforms_surface()
         self.player = Player(100, 100)
-        self.bullets = pygame.sprite.Group()  # todo:мусор
-        self.enemies = list()  # todo:мусор
+        self.enemies = pygame.sprite.Group()
 
     @staticmethod
     def get_infinite_background():  # бесконечный background
@@ -183,17 +189,27 @@ class Game:
     def parse_data(self):
         if self.messages:
             data = self.messages[0][0].split()
+            print(data)
             try:
-                self.player.x, self.player.y, self.hp, self.player.direction, self.player.state = int(
+                self.player.x, self.player.y, self.player.hp, self.player.direction, self.player.state = int(
                     float(data.pop(0))), int(float(data.pop(0))), int(
-                    data.pop(0)), data.pop(0), data.pop(0)  # todo:мусор
+                    data.pop(0)), data.pop(0), data.pop(0)
                 self.bullets = pygame.sprite.Group()
             except IndexError:
                 pass
-            for i in range(int(data.pop(0))):  # todo:мусор
+            for i in range(int(data.pop(0))):  # получение данных о пулях
                 self.bullets.add(Bullet(screen, int(float(data.pop(0))), int(float(data.pop(0)))))
-            for i in range(int(data.pop(0))):  # todo:мусор
-                self.enemies.append((int(float(data.pop(0))), int(float(data.pop(0))), data.pop(0)))
+            n = int(data.pop(0))
+            if len(self.enemies) == n:
+                for sprite in self.enemies:
+                    x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
+                        0), data.pop(0)
+                    sprite.update(x, y)
+            else:  # получение данных о врагах
+                for i in range(n):
+                    x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
+                        0), data.pop(0)
+                    self.enemies.add(Player(x, y, state=state, direction=direction))
             self.messages.clear()
             print(self.enemies)
 
@@ -275,19 +291,19 @@ class Game:
         else:
             self.timestamp = 0
             self.player.change_image()
+            for enemy in self.enemies:
+                enemy.change_image()
         screen.blit(self.background, self.background.get_rect())
         screen.blit(self.platforms, self.camera.apply_rect(self.platforms.get_rect()))
         screen.blit(self.player.image, self.camera.apply(self.player))
         for bullet in self.bullets:
             bullet.move()
             screen.blit(bullet.image, bullet.rect)
-        for i in self.enemies:  # todo:мусор
-            enemy = pygame.Surface((30, 50))
-            enemy.fill((255, 0, 0))
+        for enemy in self.enemies:
             try:
-                screen.blit((i[0], i[1]), enemy)
+                screen.blit(enemy.image, self.camera.apply(enemy))
             except TypeError:
-                self.enemies.clear()
+                pass
         if self.pause:
             bg_darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA, 32)
             bg_darkness.fill((0, 0, 0))
@@ -377,7 +393,7 @@ class Game:
                     self.player.update(self.player.x, self.player.y)
                 except ValueError:
                     continue
-                if self.hp <= 0:
+                if self.player.hp <= 0:
                     self.state = 7
                     network.sock_send(self.sockOut, '0')
                     network.close_sock(self.sockOut)

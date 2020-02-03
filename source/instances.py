@@ -31,7 +31,7 @@ class Bullet(Entity):
         self.direction = direction
 
     def move(self):
-        self.rect.x += 20 if self.direction == 'right' else -20
+        self.rect.x += 5 if self.direction == 'right' else -5
         self.lifespan -= 1
         self.image = pygame.image.load(
             f'../resources/misc/shot/shot-{(self.cnt % 3) + 1}.png').convert_alpha()
