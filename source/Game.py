@@ -1,10 +1,11 @@
 import pygame
+import sys
+sys.path.append('../')
+from threading import Thread
 from source import *
 from source import network
 from source import camera
 from source import button
-from source import instances
-from threading import Thread
 from source.get_platforms import *
 from source.player import Player
 
@@ -192,7 +193,7 @@ class Game:
             for i in range(int(data.pop(0))):  # todo:мусор
                 self.bullets.add(Bullet(screen, int(float(data.pop(0))), int(float(data.pop(0)))))
             for i in range(int(data.pop(0))):  # todo:мусор
-                self.enemies.append((int(data.pop(0)), int(data.pop(0)), data.pop(0)))
+                self.enemies.append((int(float(data.pop(0))), int(float(data.pop(0))), data.pop(0)))
             self.messages.clear()
             print(self.enemies)
 
@@ -403,9 +404,6 @@ class Game:
             if self.state == 7:  # Game over
                 for event in pygame.event.get():
                     self.gameover(event)
-
-
-
             pygame.display.flip()
             cl.tick(FPS)
         try:

@@ -1,11 +1,11 @@
 import socket
-import json
-import threading
 
 alive = False
 
+
 def connect_InSocket(address='0.0.0.0', port=5555):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((address, port))
     return sock
 

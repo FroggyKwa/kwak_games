@@ -30,6 +30,7 @@ while running:
             sock_send(sock, '3')
             sock.close()
         else:
+            print(address, 'подключился')
             clients[address] = connect_OutSocket(address=address[0], port=5556)
             players[address] = Player(100, 100, socket=clients[address])
             sock_send(clients[address], '1')
