@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.cnt = 1
         self.direction = 'right'
-        self.state = 'idle'  # состояние героя, изменяется на сервере
+        self.state = 'idle'  # состояние героя,  изменяется на сервере
         self.x = x0
         self.y = y0
         self.cur_image = 0

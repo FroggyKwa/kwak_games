@@ -320,7 +320,7 @@ class Game:
 
     def run(self):
         while self.running:
-            if self.state == 1:  # отрисовка меню
+            if self.state == 1:  # отрисовка  меню
                 for event in pygame.event.get():
                     self.menu(event)
                 screen.blit(self.bg_menu, (0, 0))

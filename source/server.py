@@ -3,7 +3,7 @@ import pygame
 from source.network import connect_InSocket, connect_OutSocket, read_sock, sock_send, close_sock
 from source.player import Player
 from socket import gethostname, gethostbyname
-from source.instances import *
+from source.instances  import *
 from source.get_platforms import *
 
 sockIn = connect_InSocket(address='0.0.0.0')
