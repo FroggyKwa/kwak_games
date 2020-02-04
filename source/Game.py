@@ -20,6 +20,11 @@ cl = pygame.time.Clock()
 FPS = 60
 
 
+
+#sound1 = pygame.mixer.Sound('boom.wav')
+#sound2 = pygame.mixer.Sound('one.ogg')
+
+
 class Game:
     def __init__(self):
         self.sound = sounds
@@ -156,6 +161,7 @@ class Game:
                     self.init_game()
                     print(self.msg_text)
                     self.state = 3
+                    self.music_is_off = True
                 elif data == '2':
                     self.msg_text = 'Вы уже подключены к данному серверу'
                 elif data == '3':
@@ -202,11 +208,10 @@ class Game:
             n = int(data.pop(0))
             if len(self.enemies) == n:
                 for sprite in self.enemies:
-                    x, y, sprite.direction, sprite.state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
+                    x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
                         0), data.pop(0)
                     sprite.update(x, y)
             else:  # получение данных о врагах
-                self.enemies = pygame.sprite.Group()
                 for i in range(n):
                     x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
                         0), data.pop(0)
@@ -277,7 +282,6 @@ class Game:
             self.check_cursor_on_button(self.buttons_training, pygame.mouse.get_pos())
 
     def gameover(self, event):
-        self.sockIn.close()
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
             self.state = 1
         screen.fill((0, 0, 0))
@@ -338,19 +342,34 @@ class Game:
                 continue
 
     def run(self):
+        self.music_is_off = True
         while self.running:
             if self.state == 1:  # отрисовка меню
+                if self.music_is_off:
+                    pygame.mixer.music.load('../source/resources/music/menu_music.mp3')
+                    pygame.mixer.music.set_volume(0.5)
+                    pygame.mixer.music.play()
+                    self.music_is_off = False
                 for event in pygame.event.get():
                     self.menu(event)
                 screen.blit(self.bg_menu, (0, 0))
                 self.draw_buttons(self.buttons_menu)
             if self.state == 2:  # ввод IP
+                pygame.mixer.music.pause()
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     if event.type == pygame.KEYDOWN:
+                        pygame.mixer.music.load('../source/resources/music/pechat_sound.mp3')
+                        pygame.mixer.music.set_volume(1)
+                        pygame.mixer.music.play()
                         self.enter_ip_address(event)
                 self.render_ip_text(self.ip)
             if self.state == 3:  # Игра
+                if self.music_is_off:
+                    pygame.mixer.music.load('../source/resources/music/game_music.mp3')
+                    pygame.mixer.music.set_volume(0.5)
+                    pygame.mixer.music.play()
+                    self.music_is_off = False
                 for event in pygame.event.get():
                     if self.check_exit_event(event):
                         network.sock_send(self.sockOut, '0')
@@ -370,6 +389,7 @@ class Game:
                                     if name_button == "Return to menu":
                                         network.sock_send(self.sockOut, '0')
                                         self.state = 1
+                                        self.music_is_off = True
                                     if name_button == "Continue":
                                         self.pause = False
                     else:
@@ -390,11 +410,7 @@ class Game:
                 keys = pygame.key.get_pressed()
                 self.parse_data()
                 if not self.pause:
-                    try:
-                        network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
-                    except ConnectionRefusedError:
-                        print('Сервер отключен')
-                        self.state = 1
+                    network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
                 try:
                     self.player.update(self.player.x, self.player.y)
                 except ValueError:
