@@ -1,12 +1,13 @@
 import time
+from threading import Thread
 import pygame
-from source.network import connect_InSocket, connect_OutSocket, read_sock, sock_send, close_sock
+from source import network
 from source.player import Player
 from socket import gethostname, gethostbyname
 from source.instances import *
 from source.get_platforms import *
 
-sockIn = connect_InSocket(address='0.0.0.0')
+sockIn = network.connect_InSocket(address='0.0.0.0')
 running = True
 print('IP:\n' + gethostbyname(gethostname()) + ':5555')
 pygame.init()
@@ -21,27 +22,35 @@ platforms = pygame.sprite.Group()
 get_platforms(screen, platforms)
 players['111'] = Player(300, 100)
 players['222'] = Player(500, 100)
+messages = list()
+network.alive = True
+t1 = Thread(target=network.read_server_sock, args=(sockIn, messages))
+t1.start()
 while running:
-    data, address = read_sock(sockIn)
+    print('1')
+    if not messages:
+        continue
+    data, address = messages.pop()
     if data == '1':
         if address in clients.keys():
-            sock_send(clients[address], '2')
+            network.sock_send(clients[address], '2')
         elif len(clients.values()) >= 4:
-            sock = connect_OutSocket(address=address[0], port=5556)
-            sock_send(sock, '3')
+            sock = network.connect_OutSocket(address=address[0], port=5556)
+            network.sock_send(sock, '3')
             sock.close()
         else:
             print(address, 'подключился')
-            clients[address] = connect_OutSocket(address=address[0], port=5556)
+            clients[address] = network.connect_OutSocket(address=address[0], port=5556)
             players[address] = Player(100, 100, socket=clients[address])
-            sock_send(clients[address], '1')
+            network.sock_send(clients[address], '1')
             # print(clients)
     elif data == '0':
         sock = clients.pop(address)
-        sock_send(sock, '0')
-        close_sock(sock)
+        network.sock_send(sock, '0')
+        network.close_sock(sock)
         if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False
+            network.alive = False
     elif data.startswith('2'):
         # print(players)
         player = players[address]
@@ -104,7 +113,7 @@ while running:
                                 for i in p.values() if i != p[addr]])
         reply = f'{x} {y} {hp} {d} {state} {bullets_str} {players_str}'
         try:
-            sock_send(clients[addr], reply)
+            network.sock_send(clients[addr], reply)
         except KeyError:
             pass
         for p in players.values():
@@ -116,8 +125,9 @@ while running:
                     if pygame.sprite.collide_mask(i, p) and i.owner != p:
                         i.kill()
                         p.get_damage(20)
-        print(*[f'{i.x}, {i.y}; ' for i in players.values()])
+        # print(*[f'{i.x}, {i.y}; ' for i in players.values()])
         for i in players.values():
             i.change_velocity()
     cl.tick(60)
-close_sock(sockIn)
+network.close_sock(sockIn)
+network.alive = False

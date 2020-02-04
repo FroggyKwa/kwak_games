@@ -202,10 +202,11 @@ class Game:
             n = int(data.pop(0))
             if len(self.enemies) == n:
                 for sprite in self.enemies:
-                    x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
+                    x, y, sprite.direction, sprite.state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
                         0), data.pop(0)
                     sprite.update(x, y)
             else:  # получение данных о врагах
+                self.enemies = pygame.sprite.Group()
                 for i in range(n):
                     x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
                         0), data.pop(0)
@@ -276,6 +277,7 @@ class Game:
             self.check_cursor_on_button(self.buttons_training, pygame.mouse.get_pos())
 
     def gameover(self, event):
+        self.sockIn.close()
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
             self.state = 1
         screen.fill((0, 0, 0))
@@ -388,7 +390,11 @@ class Game:
                 keys = pygame.key.get_pressed()
                 self.parse_data()
                 if not self.pause:
-                    network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
+                    try:
+                        network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
+                    except ConnectionRefusedError:
+                        print('Сервер отключен')
+                        self.state = 1
                 try:
                     self.player.update(self.player.x, self.player.y)
                 except ValueError:
