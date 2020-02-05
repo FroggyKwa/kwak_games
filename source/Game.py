@@ -19,7 +19,7 @@ pygame.display.set_caption("CyB3r_F0rC3_2O77")
 WIDTH, HEIGHT = 1280, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 cl = pygame.time.Clock()
-FPS = 60
+FPS = 120
 
 
 class Game:
@@ -139,6 +139,8 @@ class Game:
             network.alive = False
             try:
                 network.sock_send(self.sockOut, '0')
+                network.close_sock(self.sockIn)
+                network.close_sock(self.sockOut)
             except AttributeError:
                 pass
         return not self.running
@@ -371,7 +373,7 @@ class Game:
                 self.now_playing = choice(sounds['music_in_game'])
             elif state == 'Menu':
                 self.now_playing = choice(sounds['music_in_menu'])
-            self.now_playing.set_volume(0.03)
+            self.now_playing.set_volume(0.3)
             self.now_playing.play()
 
     def draw_training(self):
