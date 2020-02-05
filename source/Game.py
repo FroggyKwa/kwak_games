@@ -364,6 +364,28 @@ class Game:
             self.now_playing.set_volume(0.03)
             self.now_playing.play()
 
+    def draw_training(self):
+        images['training_image'] = pygame.transform.scale(images['training_image'],
+                                                          (int(WIDTH * 0.7), int(HEIGHT * 0.7)))
+        screen.blit(images['training_image'], (int(WIDTH * 0.025), int(HEIGHT * 0.17)))
+        font = pygame.font.Font(None, int(WIDTH * 0.03125))
+        text = font.render("W - Jump", 0, self.magenta)
+        text_x = int(WIDTH * 0.735)
+        text_y = int(HEIGHT * 0.2 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+        text = font.render("D - run right", 0, self.magenta)
+        text_y = int(HEIGHT * 0.27 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+        text = font.render("A - run left", 0, self.magenta)
+        text_y = int(HEIGHT * 0.34 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+        text = font.render("Right arrow - shoot right", 0, self.magenta)
+        text_y = int(HEIGHT * 0.41 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+        text = font.render("Left arrow - shoot left", 0, self.magenta)
+        text_y = int(HEIGHT * 0.48 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+
     def run(self):
         while self.running:
             if self.state == 1:  # отрисовка меню
@@ -458,6 +480,7 @@ class Game:
                     self.check_exit_event(event)
                     self.training(event)
                 screen.blit(self.bg_menu, (0, 0))
+                self.draw_training()
                 self.draw_buttons(self.buttons_training)
 
             if self.state == 7:  # Game over
