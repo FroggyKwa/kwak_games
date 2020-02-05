@@ -24,10 +24,9 @@ players['111'] = Player(300, 100)
 players['222'] = Player(500, 100)
 messages = list()
 network.alive = True
-t1 = Thread(target=network.read_server_sock, args=(sockIn, messages))
-t1.start()
+reader = Thread(target=network.socket_reader, args=(sockIn, messages))
+reader.start()
 while running:
-    print('1')
     if not messages:
         continue
     data, address = messages.pop()
@@ -121,10 +120,13 @@ while running:
         for i in bullets:
             if time.time() - cur_time >= 0.001:
                 i.move()
-                for p in players.values():
-                    if pygame.sprite.collide_mask(i, p) and i.owner != p:
+                for addr, player in players.items():
+                    if pygame.sprite.collide_mask(i, player) and i.owner != player:
                         i.kill()
-                        p.get_damage(20)
+                        player.get_damage(20)
+                        if player.hp == 0:
+                            players[addr] = Player(100, 100, socket=player.sock)
+
         # print(*[f'{i.x}, {i.y}; ' for i in players.values()])
         for i in players.values():
             i.change_velocity()

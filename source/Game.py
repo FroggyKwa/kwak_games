@@ -20,11 +20,6 @@ cl = pygame.time.Clock()
 FPS = 60
 
 
-
-#sound1 = pygame.mixer.Sound('boom.wav')
-#sound2 = pygame.mixer.Sound('one.ogg')
-
-
 class Game:
     def __init__(self):
         self.sound = sounds
@@ -43,6 +38,7 @@ class Game:
     def init_buttons(self):
         self.w_button, self.h_button = WIDTH // 3, HEIGHT // 15
         self.sounds_is_on = True
+        self.music_is_running = False
         self.pause = False
         self.buttons_game_pause = [
             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.3), (5, 5, 5),
@@ -88,13 +84,12 @@ class Game:
 
     def init_joining_server(self):
         self.msg_text = str()
-        self.ip = str()
         self.ip = ''
         self.sockIn = network.connect_InSocket(address='0.0.0.0', port=5556)
 
     def init_game(self):
         network.alive = True
-        t1 = Thread(target=network.read_server_sock, args=(self.sockIn, self.messages))
+        t1 = Thread(target=network.socket_reader, args=(self.sockIn, self.messages))
         t1.start()
         self.platforms = get_platforms_surface()
         self.player = Player(100, 100)
@@ -161,7 +156,7 @@ class Game:
                     self.init_game()
                     print(self.msg_text)
                     self.state = 3
-                    self.music_is_off = True
+                    self.sounds_is_on = True
                 elif data == '2':
                     self.msg_text = 'Вы уже подключены к данному серверу'
                 elif data == '3':
@@ -229,6 +224,9 @@ class Game:
                     name_button = button.Button.get_name(i)
                     if name_button == "Return to menu":
                         self.state = 1
+                        self.init_joining_server()
+                        continue
+
         else:
             self.check_cursor_on_button(self.buttons_authors, pygame.mouse.get_pos())
 
@@ -284,6 +282,7 @@ class Game:
     def gameover(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
             self.state = 1
+            self.sockIn.close()
         screen.fill((0, 0, 0))
         font = pygame.font.Font(None, 70)
         text = font.render("GAME OVER", 0, self.magenta)
@@ -341,35 +340,39 @@ class Game:
             if button.Button.check_cursor_click_button(i, x, y):
                 continue
 
+    def play_sound(self):
+        from random import choice
+        if self.music_is_running:
+            self.now_playing.fadeout(int(self.now_playing.get_length() * 1000))
+            self.music_is_running = False
+        else:
+            self.music_is_running = True
+            self.now_playing = choice(sounds['music_in_game'])
+            self.now_playing.set_volume(0.03)
+            self.now_playing.play()
+
     def run(self):
-        self.music_is_off = True
         while self.running:
             if self.state == 1:  # отрисовка меню
-                if self.music_is_off:
-                    pygame.mixer.music.load('../source/resources/music/menu_music.mp3')
-                    pygame.mixer.music.set_volume(0.5)
-                    pygame.mixer.music.play()
-                    self.music_is_off = False
+                if self.sounds_is_on:
+                    sounds['music_in_menu'].set_volume(0.2)
+                    sounds['music_in_menu'].play()
                 for event in pygame.event.get():
                     self.menu(event)
                 screen.blit(self.bg_menu, (0, 0))
                 self.draw_buttons(self.buttons_menu)
             if self.state == 2:  # ввод IP
-                pygame.mixer.music.pause()
+                sounds['music_in_menu'].stop()
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     if event.type == pygame.KEYDOWN:
-                        pygame.mixer.music.load('../source/resources/music/pechat_sound.mp3')
-                        pygame.mixer.music.set_volume(1)
-                        pygame.mixer.music.play()
+                        sounds['typing_sound'].set_volume(0.1)
+                        sounds['typing_sound'].play()
                         self.enter_ip_address(event)
                 self.render_ip_text(self.ip)
             if self.state == 3:  # Игра
-                if self.music_is_off:
-                    pygame.mixer.music.load('../source/resources/music/game_music.mp3')
-                    pygame.mixer.music.set_volume(0.5)
-                    pygame.mixer.music.play()
-                    self.music_is_off = False
+                if self.sounds_is_on:
+                    self.play_sound()
                 for event in pygame.event.get():
                     if self.check_exit_event(event):
                         network.sock_send(self.sockOut, '0')
@@ -389,7 +392,7 @@ class Game:
                                     if name_button == "Return to menu":
                                         network.sock_send(self.sockOut, '0')
                                         self.state = 1
-                                        self.music_is_off = True
+                                        sounds['music_in_menu'].play()
                                     if name_button == "Continue":
                                         self.pause = False
                     else:
@@ -442,6 +445,9 @@ class Game:
             if self.state == 7:  # Game over
                 for event in pygame.event.get():
                     self.gameover(event)
+            if not self.sounds_is_on:
+                sounds['music_in_menu'].stop()
+                sounds['music_in_game'].stop()
             pygame.display.flip()
             cl.tick(FPS)
         try:

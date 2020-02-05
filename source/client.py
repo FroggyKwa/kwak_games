@@ -102,7 +102,7 @@ while running:
                         data, address = read_sock(sockIn)  # todo: если сервер не включен то виснет, исправить
                         if data == '1':
                             msg_text = 'Подключение прошло успешно!'
-                            t1 = Thread(target=read_server_sock, args=(sockIn, messages, running))
+                            t1 = Thread(target=socket_reader, args=(sockIn, messages, running))
                             t1.start()
                             platforms = get_platforms()
                             player = instances.Player(screen)
