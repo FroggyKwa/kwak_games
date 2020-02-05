@@ -27,10 +27,11 @@ def read_sock(sock):
 
 def socket_reader(sock, storage):
     while alive:
-        data, address = sock.recvfrom(2048)
-        storage.append((data.decode(), address))
-        if not alive:  # TODO: УДАЛИТЬ
+        try:
+            data, address = sock.recvfrom(2048)
+        except OSError:
             return
+        storage.append((data.decode(), address))
 
 
 def close_sock(sock):
