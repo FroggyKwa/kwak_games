@@ -162,6 +162,7 @@ class Game:
                 try:
                     self.sockIn.settimeout(2)
                     data, address = network.read_sock(self.sockIn)
+                    self.sockIn.settimeout(None)
                 except socket.timeout:
                     self.msg_text = 'Сервер отключен! Проверьте соединение'
                     return
