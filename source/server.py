@@ -18,8 +18,6 @@ players = dict()
 bullets = pygame.sprite.Group()
 platforms = pygame.sprite.Group()
 get_platforms(screen, platforms)
-players['111'] = Player(300, 100)
-players['222'] = Player(500, 100)
 messages = list()
 network.alive = True
 reader = Thread(target=network.socket_reader, args=(sockIn, messages))
@@ -42,63 +40,60 @@ while running:
             network.sock_send(clients[address], '1')
     elif data == '0':
         print(address, 'отключился')
-        sock = clients.pop(address)
-        players[address].kill()
-        players.pop(address)
-        network.sock_send(sock, '0')
-        network.close_sock(sock)
         if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False
             network.alive = False
     elif data.startswith('2'):
-        player = players[address]
-        keys = tuple(map(int, list(data.split()[1])))
-        if not (keys[119] or keys[32] or keys[97] or keys[100]):
-            player.change_velocity()
-            if player.onGround:
-                player.state = 'idle'
-            player.shooting = False
-        if keys[119] or keys[32]:
-            player.change_velocity(direction='up')
-            player.state = 'jump'
-            player.shooting = False
-        if keys[275]:  # стрелять вправо
-            player.direction = 'right'
-            player.shooting = True
-            if player.onGround:
-                player.state = 'shoot'
-            if not player.cur_shoot_time:
-                bullets.add(Bullet(screen, player.x + 10, player.y + 23, direction='right', owner=player))
-                player.cur_shoot_time = 30
-        if keys[276]:  # стрелять влево
-            player.direction = 'left'
-            player.shooting = True
-            if player.onGround:
-                player.state = 'shoot'
-            if not player.cur_shoot_time:
-                bullets.add(Bullet(screen, player.x + 10, player.y + 23, direction='left', owner=player))
-                player.cur_shoot_time = 30
-        if keys[97]:  # идти влево
-            player.change_velocity(direction='left')
-            player.direction = 'left'
-            if not player.state == 'jump':
-                if not player.shooting:
-                    player.state = 'run'
-                else:
-                    player.state = 'run-shoot'
-        if keys[100]:  # идти вправо
-            player.change_velocity(direction='right')
-            player.direction = 'right'
-            if not player.state == 'jump':
-                if not player.shooting:
-                    player.state = 'run'
-                else:
-                    player.state = 'run-shoot'
-        if keys[275]:
-            player.direction = 'right'
-        elif keys[276]:
-            player.direction = 'left'
-
+        try:
+            player = players[address]
+            keys = tuple(map(int, list(data.split()[1])))
+            if not (keys[119] or keys[32] or keys[97] or keys[100]):
+                player.change_velocity()
+                if player.onGround:
+                    player.state = 'idle'
+                player.shooting = False
+            if keys[119] or keys[32]:
+                player.change_velocity(direction='up')
+                player.state = 'jump'
+                player.shooting = False
+            if keys[275]:  # стрелять вправо
+                player.direction = 'right'
+                player.shooting = True
+                if player.onGround:
+                    player.state = 'shoot'
+                if not player.cur_shoot_time:
+                    bullets.add(Bullet(screen, player.x + 10, player.y + 23, direction='right', owner=player))
+                    player.cur_shoot_time = 30
+            if keys[276]:  # стрелять влево
+                player.direction = 'left'
+                player.shooting = True
+                if player.onGround:
+                    player.state = 'shoot'
+                if not player.cur_shoot_time:
+                    bullets.add(Bullet(screen, player.x + 10, player.y + 23, direction='left', owner=player))
+                    player.cur_shoot_time = 30
+            if keys[97]:  # идти влево
+                player.change_velocity(direction='left')
+                player.direction = 'left'
+                if not player.state == 'jump':
+                    if not player.shooting:
+                        player.state = 'run'
+                    else:
+                        player.state = 'run-shoot'
+            if keys[100]:  # идти вправо
+                player.change_velocity(direction='right')
+                player.direction = 'right'
+                if not player.state == 'jump':
+                    if not player.shooting:
+                        player.state = 'run'
+                    else:
+                        player.state = 'run-shoot'
+            if keys[275]:
+                player.direction = 'right'
+            elif keys[276]:
+                player.direction = 'left'
+        except KeyError:
+            pass
     for i in players.values():
         if i.cur_shoot_time:
             i.cur_shoot_time -= 1
@@ -132,6 +127,6 @@ while running:
 
         for i in players.values():
             i.change_velocity()
-    cl.tick(120)
+    cl.tick(1000)
 network.close_sock(sockIn)
 network.alive = False

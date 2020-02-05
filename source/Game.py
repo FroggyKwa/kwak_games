@@ -215,11 +215,15 @@ class Game:
                 for sprite in self.enemies:
                     x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
                         0), data.pop(0)
+                    sprite.direction = direction
+                    sprite.state = state
                     sprite.update(x, y)
             else:  # получение данных о врагах
+                self.enemies = pygame.sprite.Group()
                 for i in range(n):
                     x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
                         0), data.pop(0)
+                    print(x, y, state, direction)
                     self.enemies.add(Player(x, y, state=state, direction=direction))
             self.messages.clear()
 
