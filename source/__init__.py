@@ -20,7 +20,8 @@ count_sprites = {
 }
 images = {
     "background": pygame.image.load(resolve_route("../resources/background.png")),
-    "bg_menu": pygame.image.load("../resources/bg_for_menu.png")
+    "bg_menu": pygame.image.load("../resources/bg_for_menu.png"),
+    "training_image": pygame.image.load("../resources/training.png")
 }
 sounds = {"music_in_game": [pygame.mixer.Sound(resolve_route('../resources/music/game_music.wav'))],
           "music_in_menu": [pygame.mixer.Sound(resolve_route('../resources/music/menu_music.wav'))],
