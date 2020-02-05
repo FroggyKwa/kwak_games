@@ -1,10 +1,8 @@
 import time
 from threading import Thread
-import pygame
 from source import network
 from source.player import Player
 from socket import gethostname, gethostbyname
-from source.instances import *
 from source.get_platforms import *
 
 sockIn = network.connect_InSocket(address='0.0.0.0')
@@ -42,16 +40,17 @@ while running:
             clients[address] = network.connect_OutSocket(address=address[0], port=5556)
             players[address] = Player(100, 100, socket=clients[address])
             network.sock_send(clients[address], '1')
-            # print(clients)
     elif data == '0':
+        print(address, 'отключился')
         sock = clients.pop(address)
+        players[address].kill()
+        players.pop(address)
         network.sock_send(sock, '0')
         network.close_sock(sock)
         if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False
             network.alive = False
     elif data.startswith('2'):
-        # print(players)
         player = players[address]
         keys = tuple(map(int, list(data.split()[1])))
         if not (keys[119] or keys[32] or keys[97] or keys[100]):
@@ -99,9 +98,11 @@ while running:
             player.direction = 'right'
         elif keys[276]:
             player.direction = 'left'
+
     for i in players.values():
         if i.cur_shoot_time:
             i.cur_shoot_time -= 1
+
     for addr in players.keys():
         p = players
         x, y, hp, d, state = p[addr].x, p[addr].y, p[addr].hp, p[addr].direction, p[addr].state
@@ -115,8 +116,10 @@ while running:
             network.sock_send(clients[addr], reply)
         except KeyError:
             pass
+
         for p in players.values():
             p.move(platforms)
+
         for i in bullets:
             if time.time() - cur_time >= 0.001:
                 i.move()
@@ -127,9 +130,8 @@ while running:
                         if player.hp == 0:
                             players[addr] = Player(100, 100, socket=player.sock)
 
-        # print(*[f'{i.x}, {i.y}; ' for i in players.values()])
         for i in players.values():
             i.change_velocity()
-    cl.tick(60)
+    cl.tick(120)
 network.close_sock(sockIn)
 network.alive = False

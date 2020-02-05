@@ -23,6 +23,6 @@ images = {
     "bg_menu": pygame.image.load("../resources/bg_for_menu.png")
 }
 sounds = {"music_in_game": [pygame.mixer.Sound(resolve_route('../resources/music/game_music.wav'))],
-          "music_in_menu": pygame.mixer.Sound(resolve_route('../resources/music/menu_music.wav')),
+          "music_in_menu": [pygame.mixer.Sound(resolve_route('../resources/music/menu_music.wav'))],
           "typing_sound": pygame.mixer.Sound(resolve_route('../resources/music/typing.wav')),
           }
