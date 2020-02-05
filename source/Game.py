@@ -16,7 +16,7 @@ pygame.init()
 pygame.font.init()
 
 pygame.display.set_caption("CyB3r_F0rC3_2O77")
-WIDTH, HEIGHT = 1280, 800
+WIDTH, HEIGHT = 800, 480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 cl = pygame.time.Clock()
 FPS = 120
@@ -30,7 +30,7 @@ class Game:
         self.size = (WIDTH, HEIGHT)
         self.state = 1
         self.messages = list()
-        self.camera = camera.Camera(1280, 800, (1280, 800))
+        self.camera = camera.Camera(1280, 800, (WIDTH, HEIGHT))
         self.running = True
         self.init_buttons()
         self.init_joining_server()
