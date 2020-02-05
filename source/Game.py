@@ -297,7 +297,7 @@ class Game:
         text_x = WIDTH // 2 - text.get_width() // 2
         screen.blit(text, (text_x, 150))
 
-    def draw(self):
+    def draw(self, hp):
         self.camera.update(self.player)
         if self.timestamp <= 70:
             self.timestamp += cl.get_time()
@@ -318,13 +318,19 @@ class Game:
             except TypeError:
                 pass
         if self.pause:
-            bg_darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA, 32)
+            bg_darkness = pygame.Surface((WIDTH, HEIGHT))
+            bg_darkness.set_alpha(130)
             bg_darkness.fill((0, 0, 0))
-            bg_darkness.set_alpha(150)
-            screen.blit(bg_darkness, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
+            screen.blit(bg_darkness, (0, 0))
             self.draw_buttons(self.buttons_game_pause)
         else:
             self.draw_buttons(self.buttons_game_not_pause)
+            font = pygame.font.Font(None, int(WIDTH * 0.03125))
+            text = font.render(f"Hp: {hp}/100", 0, self.magenta)
+            text_x = int(WIDTH * 0.01)
+            text_y = int(HEIGHT * 0.01)
+            screen.blit(text, (text_x, text_y))
+
 
     def draw_buttons(self, buttons):
         for i in buttons:
@@ -462,7 +468,7 @@ class Game:
                     self.state = 7
                     network.sock_send(self.sockOut, '0')
                     network.close_sock(self.sockOut)
-                self.draw()
+                self.draw(self.player.hp)
             if self.state == 4:  # авторы
                 for event in pygame.event.get():
                     self.check_exit_event(event)
