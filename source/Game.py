@@ -510,6 +510,8 @@ class Game:
                     self.authors(event)
                 self.draw_authors()
             if self.state == 5:  # настройки
+                if self.sounds_is_on:
+                    self.play_sound(state='Menu')
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     self.settings(event)
