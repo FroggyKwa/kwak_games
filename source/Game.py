@@ -1,10 +1,14 @@
+import socket
+import sys
+from threading import Thread;
+
+sys.path.append('../')
 import pygame
+
 from source import *
 from source import network
 from source import camera
 from source import button
-from source import instances
-from threading import Thread
 from source.get_platforms import *
 from source.player import Player
 
@@ -12,10 +16,10 @@ pygame.init()
 pygame.font.init()
 
 pygame.display.set_caption("CyB3r_F0rC3_2O77")
-WIDTH, HEIGHT = 1280, 800
+WIDTH, HEIGHT = 800, 480
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 cl = pygame.time.Clock()
-FPS = 60
+FPS = 120
 
 
 class Game:
@@ -26,16 +30,16 @@ class Game:
         self.size = (WIDTH, HEIGHT)
         self.state = 1
         self.messages = list()
-        self.camera = camera.Camera(1280, 800, (1280, 800))
+        self.camera = camera.Camera(1280, 800, (WIDTH, HEIGHT))
         self.running = True
         self.init_buttons()
         self.init_joining_server()
-        self.pause = False
         self.timestamp = 0
 
     def init_buttons(self):
         self.w_button, self.h_button = WIDTH // 3, HEIGHT // 15
         self.sounds_is_on = True
+        self.music_is_running = False
         self.pause = False
         self.buttons_game_pause = [
             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.3), (5, 5, 5),
@@ -46,11 +50,17 @@ class Game:
             button.Button(self.h_button, self.h_button, WIDTH // 2 - (self.h_button // 2), int(HEIGHT * 0.01),
                           (5, 5, 5), (15, 15, 15), (25, 25, 25), "II")]
 
-        self.buttons_menu = [button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.2), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Join server"),
-             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.30625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
-             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.40625), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
-             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.5125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings"),
-             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.6125), (5, 5, 5), (15, 15, 15), (25, 25, 25), "Quit game")]
+        self.buttons_menu = [
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.2), (5, 5, 5),
+                          (15, 15, 15), (25, 25, 25), "Join server"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.30625),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "Authors"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.40625),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "Training"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.5125),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings"),
+            button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.6125),
+                          (5, 5, 5), (15, 15, 15), (25, 25, 25), "Quit game")]
         self.bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
         self.buttons_authors = [
             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.9), (5, 5, 5),
@@ -74,19 +84,18 @@ class Game:
         self.magenta = (200, 0, 255)
 
     def init_joining_server(self):
+        self.pause = False
         self.msg_text = str()
-        self.ip = str()
         self.ip = ''
         self.sockIn = network.connect_InSocket(address='0.0.0.0', port=5556)
 
     def init_game(self):
         network.alive = True
-        t1 = Thread(target=network.read_server_sock, args=(self.sockIn, self.messages))
-        t1.start()
+        self.t1 = Thread(target=network.socket_reader, args=(self.sockIn, self.messages))
+        self.t1.start()
         self.platforms = get_platforms_surface()
         self.player = Player(100, 100)
-        self.bullets = pygame.sprite.Group()  # todo:мусор
-        self.enemies = list()  # todo:мусор
+        self.enemies = pygame.sprite.Group()
 
     @staticmethod
     def get_infinite_background():  # бесконечный background
@@ -127,6 +136,13 @@ class Game:
     def check_exit_event(self, event):
         if event.type == pygame.QUIT:
             self.running = False
+            network.alive = False
+            try:
+                network.sock_send(self.sockOut, '0')
+                network.close_sock(self.sockIn)
+                network.close_sock(self.sockOut)
+            except AttributeError:
+                pass
         return not self.running
 
     def enter_ip_address(self, event):
@@ -143,18 +159,24 @@ class Game:
                 self.msg_text = 'IP указан неккоректно'
             else:
                 network.sock_send(self.sockOut, '1')
-                data, address = network.read_sock(self.sockIn)  # todo: если сервер не включен то виснет, исправить
+                try:
+                    self.sockIn.settimeout(2)
+                    data, address = network.read_sock(self.sockIn)
+                    self.sockIn.settimeout(None)
+                except socket.timeout:
+                    self.msg_text = 'Сервер отключен! Проверьте соединение'
+                    return
                 if data == '1':
                     self.msg_text = 'Подключение прошло успешно!'
                     self.init_game()
                     print(self.msg_text)
                     self.state = 3
+                    self.sounds_is_on = True
                 elif data == '2':
                     self.msg_text = 'Вы уже подключены к данному серверу'
                 elif data == '3':
                     self.msg_text = 'Сервер уже заполнен!'
         self.ip = self.ip + event.unicode if event.unicode.isprintable() else self.ip
-        print(self.ip)
 
     def render_ip_text(self, ip):
         font = pygame.font.Font(None, 70)
@@ -183,18 +205,30 @@ class Game:
         if self.messages:
             data = self.messages[0][0].split()
             try:
-                self.player.x, self.player.y, self.hp, self.player.direction, self.player.state = int(
+                self.player.x, self.player.y, self.player.hp, self.player.direction, self.player.state = int(
                     float(data.pop(0))), int(float(data.pop(0))), int(
-                    data.pop(0)), data.pop(0), data.pop(0)  # todo:мусор
+                    data.pop(0)), data.pop(0), data.pop(0)
                 self.bullets = pygame.sprite.Group()
+                for i in range(int(data.pop(0))):  # получение данных о пулях
+                    self.bullets.add(Bullet(screen, int(float(data.pop(0))), int(float(data.pop(0)))))
             except IndexError:
                 pass
-            for i in range(int(data.pop(0))):  # todo:мусор
-                self.bullets.add(Bullet(screen, int(float(data.pop(0))), int(float(data.pop(0)))))
-            for i in range(int(data.pop(0))):  # todo:мусор
-                self.enemies.append((int(data.pop(0)), int(data.pop(0)), data.pop(0)))
+            n = int(data.pop(0))
+            if len(self.enemies) == n:
+                for sprite in self.enemies:
+                    x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
+                        0), data.pop(0)
+                    sprite.direction = direction
+                    sprite.state = state
+                    sprite.update(x, y)
+            else:  # получение данных о врагах
+                self.enemies = pygame.sprite.Group()
+                for i in range(n):
+                    x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
+                        0), data.pop(0)
+                    print(x, y, state, direction)
+                    self.enemies.add(Player(x, y, state=state, direction=direction))
             self.messages.clear()
-            print(self.enemies)
 
     def authors(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -206,6 +240,8 @@ class Game:
                     name_button = button.Button.get_name(i)
                     if name_button == "Return to menu":
                         self.state = 1
+
+
         else:
             self.check_cursor_on_button(self.buttons_authors, pygame.mouse.get_pos())
 
@@ -236,10 +272,10 @@ class Game:
                     name_button = button.Button.get_name(i)
                     if name_button == "Return to menu":
                         self.state = 1
-                    if name_button == "Turn off sounds":
+                    elif name_button == "Turn off sounds":
                         self.sounds_is_on = False
                         button.Button.change_name(i, "Turn on sounds")
-                    if name_button == "Turn on sounds":
+                    elif name_button == "Turn on sounds":
                         self.sounds_is_on = True
                         button.Button.change_name(i, "Turn off sounds")
         else:
@@ -261,40 +297,47 @@ class Game:
     def gameover(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
             self.state = 1
+            self.sockIn.close()
         screen.fill((0, 0, 0))
         font = pygame.font.Font(None, 70)
         text = font.render("GAME OVER", 0, self.magenta)
         text_x = WIDTH // 2 - text.get_width() // 2
         screen.blit(text, (text_x, 150))
 
-    def draw(self):
+    def draw(self, hp):
         self.camera.update(self.player)
         if self.timestamp <= 70:
             self.timestamp += cl.get_time()
         else:
             self.timestamp = 0
             self.player.change_image()
+            for enemy in self.enemies:
+                enemy.change_image()
         screen.blit(self.background, self.background.get_rect())
         screen.blit(self.platforms, self.camera.apply_rect(self.platforms.get_rect()))
         screen.blit(self.player.image, self.camera.apply(self.player))
         for bullet in self.bullets:
             bullet.move()
             screen.blit(bullet.image, bullet.rect)
-        for i in self.enemies:  # todo:мусор
-            enemy = pygame.Surface((30, 50))
-            enemy.fill((255, 0, 0))
+        for enemy in self.enemies:
             try:
-                screen.blit((i[0], i[1]), enemy)
+                screen.blit(enemy.image, self.camera.apply(enemy))
             except TypeError:
-                self.enemies.clear()
+                pass
         if self.pause:
-            bg_darkness = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA, 32)
+            bg_darkness = pygame.Surface((WIDTH, HEIGHT))
+            bg_darkness.set_alpha(130)
             bg_darkness.fill((0, 0, 0))
-            bg_darkness.set_alpha(150)
-            screen.blit(bg_darkness, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
+            screen.blit(bg_darkness, (0, 0))
             self.draw_buttons(self.buttons_game_pause)
         else:
             self.draw_buttons(self.buttons_game_not_pause)
+            font = pygame.font.Font(None, int(WIDTH * 0.03125))
+            text = font.render(f"Hp: {hp}/100", 0, self.magenta)
+            text_x = int(WIDTH * 0.01)
+            text_y = int(HEIGHT * 0.01)
+            screen.blit(text, (text_x, text_y))
+
 
     def draw_buttons(self, buttons):
         for i in buttons:
@@ -306,32 +349,77 @@ class Game:
             text_y = y + b_height // 2 - text.get_height() // 2
             screen.blit(text, (text_x, text_y))
 
-    def check_cursor_on_button(self, buttons, xy):
+    @staticmethod
+    def check_cursor_on_button(buttons, xy):
         x, y = xy
         for i in buttons:
             if button.Button.check_cursor_on_button(i, x, y):
                 continue
 
-    def check_cursor_click_button(self, buttons, xy):
+    @staticmethod
+    def check_cursor_click_button(buttons, xy):
         x, y = xy
         for i in buttons:
             if button.Button.check_cursor_click_button(i, x, y):
                 continue
 
+    def play_sound(self, state='Game'):
+        from random import choice
+        if self.music_is_running:
+            self.now_playing.fadeout(int(self.now_playing.get_length() * 1000))
+            self.music_is_running = False
+        else:
+            self.music_is_running = True
+            if state == 'Game':
+                self.now_playing = choice(sounds['music_in_game'])
+            elif state == 'Menu':
+                self.now_playing = choice(sounds['music_in_menu'])
+            self.now_playing.set_volume(0.3)
+            self.now_playing.play()
+
+    def draw_training(self):
+        images['training_image'] = pygame.transform.scale(images['training_image'],
+                                                          (int(WIDTH * 0.7), int(HEIGHT * 0.7)))
+        screen.blit(images['training_image'], (int(WIDTH * 0.025), int(HEIGHT * 0.17)))
+        font = pygame.font.Font(None, int(WIDTH * 0.03125))
+        text = font.render("W - Jump", 0, self.magenta)
+        text_x = int(WIDTH * 0.735)
+        text_y = int(HEIGHT * 0.2 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+        text = font.render("D - run right", 0, self.magenta)
+        text_y = int(HEIGHT * 0.27 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+        text = font.render("A - run left", 0, self.magenta)
+        text_y = int(HEIGHT * 0.34 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+        text = font.render("Right arrow - shoot right", 0, self.magenta)
+        text_y = int(HEIGHT * 0.41 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+        text = font.render("Left arrow - shoot left", 0, self.magenta)
+        text_y = int(HEIGHT * 0.48 - text.get_height() // 2)
+        screen.blit(text, (text_x, text_y))
+
     def run(self):
         while self.running:
-            if self.state == 1:  # отрисовка  меню
+            if self.state == 1:  # отрисовка меню
+                if self.sounds_is_on:
+                    self.play_sound(state='Menu')
                 for event in pygame.event.get():
                     self.menu(event)
                 screen.blit(self.bg_menu, (0, 0))
                 self.draw_buttons(self.buttons_menu)
             if self.state == 2:  # ввод IP
+                self.now_playing.stop()
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     if event.type == pygame.KEYDOWN:
+                        sounds['typing_sound'].set_volume(0.3)
+                        sounds['typing_sound'].play()
                         self.enter_ip_address(event)
                 self.render_ip_text(self.ip)
             if self.state == 3:  # Игра
+                if self.sounds_is_on:
+                    self.play_sound()
                 for event in pygame.event.get():
                     if self.check_exit_event(event):
                         network.sock_send(self.sockOut, '0')
@@ -351,6 +439,13 @@ class Game:
                                     if name_button == "Return to menu":
                                         network.sock_send(self.sockOut, '0')
                                         self.state = 1
+                                        self.t1.join()
+                                        network.alive = False
+                                        self.messages.clear()
+                                        self.init_joining_server()
+                                        self.now_playing.stop()
+                                        continue
+
                                     if name_button == "Continue":
                                         self.pause = False
                     else:
@@ -376,11 +471,11 @@ class Game:
                     self.player.update(self.player.x, self.player.y)
                 except ValueError:
                     continue
-                if self.hp <= 0:
+                if self.player.hp <= 0:
                     self.state = 7
                     network.sock_send(self.sockOut, '0')
                     network.close_sock(self.sockOut)
-                self.draw()
+                self.draw(self.player.hp)
             if self.state == 4:  # авторы
                 for event in pygame.event.get():
                     self.check_exit_event(event)
@@ -398,18 +493,19 @@ class Game:
                     self.check_exit_event(event)
                     self.training(event)
                 screen.blit(self.bg_menu, (0, 0))
+                self.draw_training()
                 self.draw_buttons(self.buttons_training)
 
             if self.state == 7:  # Game over
                 for event in pygame.event.get():
                     self.gameover(event)
-
-
-
+            if not self.sounds_is_on:
+                self.now_playing.stop()
             pygame.display.flip()
             cl.tick(FPS)
         try:
             network.alive = False
+            network.sock_send(self.sockOut, '0')
             network.close_sock(self.sockIn)
             network.close_sock(self.sockOut)
             pygame.quit()

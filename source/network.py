@@ -1,11 +1,11 @@
 import socket
-import json
-import threading
 
 alive = False
 
+
 def connect_InSocket(address='0.0.0.0', port=5555):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind((address, port))
     return sock
 
@@ -25,12 +25,13 @@ def read_sock(sock):
     return data.decode(), address
 
 
-def read_server_sock(sock, storage):
+def socket_reader(sock, storage):
     while alive:
-        data, address = sock.recvfrom(2048)
-        storage.append((data.decode(), address))
-        if not alive:  # TODO: УДАЛИТЬ
+        try:
+            data, address = sock.recvfrom(2048)
+        except OSError:
             return
+        storage.append((data.decode(), address))
 
 
 def close_sock(sock):
