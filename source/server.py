@@ -40,11 +40,8 @@ while running:
             network.sock_send(clients[address], '1')
     elif data == '0':
         print(address, 'отключился')
-        try:
-            clients.pop(address)
-            players.pop(address)
-        except KeyError:
-            pass
+        clients.pop(address)
+        players.pop(address)
         if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False
             network.alive = False
