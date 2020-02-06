@@ -89,6 +89,7 @@ class Game:
         self.ip = ''
         self.sockIn = network.connect_InSocket(address='0.0.0.0', port=5556)
 
+
     def init_game(self):
         network.alive = True
         self.t1 = Thread(target=network.socket_reader, args=(self.sockIn, self.messages))
@@ -121,6 +122,7 @@ class Game:
                     name_button = button.Button.get_name(i)
                     if name_button == "Join server":
                         self.state = 2
+                        self.now_playing.stop()
                     if name_button == "Authors":
                         self.state = 4
                     if name_button == "Training":
@@ -383,17 +385,13 @@ class Game:
 
     def play_sound(self, state='Game'):
         from random import randint
-        if self.music_is_running:
-            self.now_playing.fadeout(int(self.now_playing.get_length() * 1000))
-            self.music_is_running = False
-        else:
-            self.music_is_running = True
+        if not pygame.mixer.get_busy():
             if state == 'Game':
                 self.now_playing = sounds['music_in_game'][randint(0, len(sounds['music_in_game']) - 1)]
             elif state == 'Menu':
                 self.now_playing = sounds['music_in_menu'][randint(0, len(sounds['music_in_menu']) - 1)]
-            self.now_playing.set_volume(0.1)
             self.now_playing.play()
+        self.now_playing.set_volume(0.2)
 
     def draw_training(self):
         images['training_image'] = pygame.transform.scale(images['training_image'],
@@ -427,12 +425,14 @@ class Game:
                 screen.blit(self.bg_menu, (0, 0))
                 self.draw_buttons(self.buttons_menu)
             if self.state == 2:  # ввод IP
-                self.now_playing.stop()
+                self.now_playing = sounds['typing_sound']
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     if event.type == pygame.KEYDOWN:
-                        sounds['typing_sound'].set_volume(0.3)
-                        sounds['typing_sound'].play()
+                        self.now_playing.stop()
+                        self.now_playing = sounds['typing_sound']
+                        self.now_playing.set_volume(0.2)
+                        self.now_playing.play()
                         self.enter_ip_address(event)
                 self.render_ip_text(self.ip)
             if self.state == 3:  # Игра
@@ -530,8 +530,8 @@ class Game:
                 for event in pygame.event.get():
                     self.gameover(event)
             if not self.sounds_is_on:
-                pygame.mixer.stop()
-                self.now_playing.stop()
+                #pygame.mixer.stop()
+                self.now_playing.set_volume(0)
             pygame.display.flip()
             cl.tick(FPS)
         try:
