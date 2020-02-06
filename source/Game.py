@@ -16,7 +16,7 @@ pygame.init()
 pygame.font.init()
 
 pygame.display.set_caption("CyB3r_F0rC3_2O77")
-WIDTH, HEIGHT = 800, 480
+WIDTH, HEIGHT = 1280, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 cl = pygame.time.Clock()
 FPS = 120
@@ -482,6 +482,8 @@ class Game:
                     self.authors(event)
                 self.draw_authors()
             if self.state == 5:  # настройки
+                if self.sounds_is_on:
+                    self.play_sound(state='Menu')
                 for event in pygame.event.get():
                     self.check_exit_event(event)
                     self.settings(event)
