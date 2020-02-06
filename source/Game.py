@@ -87,7 +87,6 @@ class Game:
         self.pause = False
         self.msg_text = str()
         self.ip = ''
-        self.sockIn = network.connect_InSocket(address='0.0.0.0', port=5556)
 
 
     def init_game(self):
@@ -148,6 +147,7 @@ class Game:
         return not self.running
 
     def enter_ip_address(self, event):
+        self.sockIn = network.connect_InSocket(address='0.0.0.0', port=5556)
         if event.key == 8:  # backspace
             self.ip = self.ip[:-1]
         if event.key == 27:  # escape
@@ -174,7 +174,6 @@ class Game:
                     self.init_game()
                     print(self.msg_text)
                     self.state = 3
-                    self.sounds_is_on = True
                 elif data == '2':
                     self.msg_text = 'Вы уже подключены к данному серверу'
                 elif data == '3':
@@ -455,14 +454,15 @@ class Game:
                                 if button.Button.check_cursor_release_button(i, x, y):
                                     name_button = button.Button.get_name(i)
                                     if name_button == "Return to menu":
-                                        network.sock_send(self.sockOut, '0')
                                         self.state = 1
                                         network.alive = False
                                         self.messages.clear()
+                                        network.sock_send(self.sockOut, '0')
+                                        network.close_sock(self.sockIn)
+                                        network.close_sock(self.sockOut)
                                         self.init_joining_server()
                                         self.now_playing.stop()
                                         continue
-
                                     if name_button == "Continue":
                                         self.pause = False
                     else:
@@ -475,11 +475,8 @@ class Game:
                                     name_button = button.Button.get_name(i)
                                     if name_button == "II":
                                         self.pause = True
-                else:
-                    if self.pause:
-                        self.check_cursor_on_button(self.buttons_game_pause, pygame.mouse.get_pos())
-                    else:
-                        self.check_cursor_on_button(self.buttons_game_not_pause, pygame.mouse.get_pos())
+                if not self.state == 3:
+                    continue
                 keys = pygame.key.get_pressed()
                 self.parse_data()
                 if not self.pause:
@@ -492,9 +489,8 @@ class Game:
                             network.sock_send(self.sockOut, '0')
                             network.close_sock(self.sockIn)
                             network.close_sock(self.sockOut)
-                        except AttributeError:
+                        except OSError:
                             pass
-                        return
                 try:
                     self.player.update(self.player.x, self.player.y)
                 except ValueError:
