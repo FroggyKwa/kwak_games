@@ -40,6 +40,11 @@ while running:
             network.sock_send(clients[address], '1')
     elif data == '0':
         print(address, 'отключился')
+        try:
+            clients.pop(address)
+            players.pop(address)
+        except KeyError:
+            pass
         if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False
             network.alive = False
@@ -122,7 +127,7 @@ while running:
                     if pygame.sprite.collide_mask(i, player) and i.owner != player:
                         i.kill()
                         player.get_damage(20)
-                        if player.hp == 0:
+                        if player.hp < 0:
                             players[addr] = Player(100, 100, socket=player.sock)
 
         for i in players.values():

@@ -16,7 +16,7 @@ pygame.init()
 pygame.font.init()
 
 pygame.display.set_caption("CyB3r_F0rC3_2O77")
-WIDTH, HEIGHT = 800, 480
+WIDTH, HEIGHT = 1280, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 cl = pygame.time.Clock()
 FPS = 120
@@ -61,7 +61,7 @@ class Game:
                           (5, 5, 5), (15, 15, 15), (25, 25, 25), "Settings"),
             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.6125),
                           (5, 5, 5), (15, 15, 15), (25, 25, 25), "Quit game")]
-        self.bg_menu = pygame.image.load("../source/resources/bg_for_menu.png")
+        self.bg_menu = images['bg_menu']
         self.buttons_authors = [
             button.Button(self.w_button, self.h_button, WIDTH // 2 - (self.w_button // 2), int(HEIGHT * 0.9), (5, 5, 5),
                           (15, 15, 15), (25, 25, 25), "Return to menu")]
@@ -165,6 +165,7 @@ class Game:
                     self.sockIn.settimeout(None)
                 except socket.timeout:
                     self.msg_text = 'Сервер отключен! Проверьте соединение'
+                    self.state = 1
                     return
                 if data == '1':
                     self.msg_text = 'Подключение прошло успешно!'
@@ -213,7 +214,19 @@ class Game:
                     self.bullets.add(Bullet(screen, int(float(data.pop(0))), int(float(data.pop(0)))))
             except IndexError:
                 pass
-            n = int(data.pop(0))
+            try:
+                n = int(data.pop(0))
+            except IndexError:
+                self.running = False
+                network.alive = False
+                print('Произошла ошибка сервера! Повторите попытку подключения')
+                try:
+                    network.sock_send(self.sockOut, '0')
+                    network.close_sock(self.sockIn)
+                    network.close_sock(self.sockOut)
+                except AttributeError:
+                    pass
+                return
             if len(self.enemies) == n:
                 for sprite in self.enemies:
                     x, y, direction, state = int(float(data.pop(0))), int(float(data.pop(0))), data.pop(
@@ -296,15 +309,21 @@ class Game:
 
     def gameover(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
-            self.state = 1
             self.sockIn.close()
+            self.state = 1
+            self.t1.join()
+            network.alive = False
+            self.messages.clear()
+            self.init_joining_server()
+            self.now_playing.stop()
+
         screen.fill((0, 0, 0))
         font = pygame.font.Font(None, 70)
         text = font.render("GAME OVER", 0, self.magenta)
         text_x = WIDTH // 2 - text.get_width() // 2
         screen.blit(text, (text_x, 150))
 
-    def draw(self, hp):
+    def draw(self):
         self.camera.update(self.player)
         if self.timestamp <= 70:
             self.timestamp += cl.get_time()
@@ -333,11 +352,10 @@ class Game:
         else:
             self.draw_buttons(self.buttons_game_not_pause)
             font = pygame.font.Font(None, int(WIDTH * 0.03125))
-            text = font.render(f"Hp: {hp}/100", 0, self.magenta)
+            text = font.render(f"Hp: {self.player.hp}/100", 0, self.magenta)
             text_x = int(WIDTH * 0.01)
             text_y = int(HEIGHT * 0.01)
             screen.blit(text, (text_x, text_y))
-
 
     def draw_buttons(self, buttons):
         for i in buttons:
@@ -364,17 +382,17 @@ class Game:
                 continue
 
     def play_sound(self, state='Game'):
-        from random import choice
+        from random import randint
         if self.music_is_running:
             self.now_playing.fadeout(int(self.now_playing.get_length() * 1000))
             self.music_is_running = False
         else:
             self.music_is_running = True
             if state == 'Game':
-                self.now_playing = choice(sounds['music_in_game'])
+                self.now_playing = sounds['music_in_game'][randint(0, len(sounds['music_in_game']) - 1)]
             elif state == 'Menu':
-                self.now_playing = choice(sounds['music_in_menu'])
-            self.now_playing.set_volume(0.3)
+                self.now_playing = sounds['music_in_menu'][randint(0, len(sounds['music_in_menu']) - 1)]
+            self.now_playing.set_volume(0.1)
             self.now_playing.play()
 
     def draw_training(self):
@@ -439,7 +457,6 @@ class Game:
                                     if name_button == "Return to menu":
                                         network.sock_send(self.sockOut, '0')
                                         self.state = 1
-                                        self.t1.join()
                                         network.alive = False
                                         self.messages.clear()
                                         self.init_joining_server()
@@ -466,7 +483,18 @@ class Game:
                 keys = pygame.key.get_pressed()
                 self.parse_data()
                 if not self.pause:
-                    network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
+                    try:
+                        network.sock_send(self.sockOut, '2 ' + ''.join(map(str, keys)))
+                    except OSError:
+                        self.running = False
+                        network.alive = False
+                        try:
+                            network.sock_send(self.sockOut, '0')
+                            network.close_sock(self.sockIn)
+                            network.close_sock(self.sockOut)
+                        except AttributeError:
+                            pass
+                        return
                 try:
                     self.player.update(self.player.x, self.player.y)
                 except ValueError:
@@ -475,7 +503,7 @@ class Game:
                     self.state = 7
                     network.sock_send(self.sockOut, '0')
                     network.close_sock(self.sockOut)
-                self.draw(self.player.hp)
+                self.draw()
             if self.state == 4:  # авторы
                 for event in pygame.event.get():
                     self.check_exit_event(event)
@@ -500,6 +528,7 @@ class Game:
                 for event in pygame.event.get():
                     self.gameover(event)
             if not self.sounds_is_on:
+                pygame.mixer.stop()
                 self.now_playing.stop()
             pygame.display.flip()
             cl.tick(FPS)
