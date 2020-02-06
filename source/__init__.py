@@ -23,7 +23,11 @@ images = {
     "bg_menu": pygame.image.load("../resources/bg_for_menu.png"),
     "training_image": pygame.image.load("../resources/training.png")
 }
-sounds = {"music_in_game": [pygame.mixer.Sound(resolve_route('../resources/music/game_music.wav'))],
+sounds = {"music_in_game": [pygame.mixer.Sound(resolve_route('../resources/music/game_music.wav')),
+                            pygame.mixer.Sound(resolve_route('../resources/music/game_music1.wav')),
+                            pygame.mixer.Sound(resolve_route('../resources/music/game_music2.wav')),
+                            pygame.mixer.Sound(resolve_route('../resources/music/game_music3.wav')),
+                            pygame.mixer.Sound(resolve_route('../resources/music/game_music4.wav'))],
           "music_in_menu": [pygame.mixer.Sound(resolve_route('../resources/music/menu_music.wav'))],
           "typing_sound": pygame.mixer.Sound(resolve_route('../resources/music/typing.wav')),
           }
