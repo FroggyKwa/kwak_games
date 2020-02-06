@@ -39,9 +39,12 @@ while running:
             players[address] = Player(100, 100, socket=clients[address])
             network.sock_send(clients[address], '1')
     elif data == '0':
-        print(address, 'отключился')
-        clients.pop(address)
-        players.pop(address)
+        try:
+            clients.pop(address)
+            players.pop(address)
+            print(address, 'отключился')
+        except KeyError:
+            pass
         if len(clients.values()) == 0:  # сомнительное решение ._.
             running = False
             network.alive = False
