@@ -66,7 +66,7 @@ class Player(pygame.sprite.Sprite):
         self.update(self.x, self.y)
         spr = None
         for i in group:
-            if pygame.sprite.collide_rect(self, i):
+            if pygame.sprite.collide_mask(self, i):
                 spr = i
                 break
         if spr is not None:
