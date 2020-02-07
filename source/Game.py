@@ -392,6 +392,8 @@ class Game:
                 self.now_playing = sounds['music_in_menu'][randint(0, len(sounds['music_in_menu']) - 1)]
             self.now_playing.play()
         self.now_playing.set_volume(0.2)
+        if not self.sounds_is_on:
+            self.now_playing.set_volume(0)
 
     def draw_training(self):
         images['training_image'] = pygame.transform.scale(images['training_image'],
@@ -456,6 +458,25 @@ class Game:
                                     name_button = button.Button.get_name(i)
                                     if name_button == "Return to menu":
                                         network.sock_send(self.sockOut, '0')
+                                        myEventType = 30
+                                        pygame.time.set_timer(myEventType, 500)
+                                        phr = 'Отключение.'
+                                        while True:
+                                            for event in pygame.event.get():
+                                                if event.type == myEventType:
+                                                    if phr[-1:-3] != '...':
+                                                        phr = phr + '.'
+                                                    else:
+                                                        phr = 'Отключение.'
+                                            font = pygame.font.Font(None, int(WIDTH * 0.03125))
+                                            text = font.render(phr, 0, self.magenta)
+                                            text_x = int(text.get_width() // 2 + WIDTH // 2)
+                                            text_y = int(HEIGHT * 0.8 - text.get_height() // 2)
+                                            screen.blit(text, (text_x, text_y))
+                                            network.sock_send(self.sockOut, '0')
+                                            if self.messages and self.messages[0][0] == '0':
+                                                break
+                                            pygame.display.flip()
                                         self.state = 1
                                         network.alive = False
                                         self.messages.clear()
@@ -530,7 +551,6 @@ class Game:
                 for event in pygame.event.get():
                     self.gameover(event)
             if not self.sounds_is_on:
-                #pygame.mixer.stop()
                 self.now_playing.set_volume(0)
             pygame.display.flip()
             cl.tick(FPS)

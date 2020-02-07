@@ -40,6 +40,7 @@ while running:
             network.sock_send(clients[address], '1')
     elif data == '0':
         try:
+            network.sock_send(clients[address], '0')
             clients.pop(address)
             players.pop(address)
             print(address, 'отключился')
@@ -67,7 +68,7 @@ while running:
                 if player.onGround:
                     player.state = 'shoot'
                 if not player.cur_shoot_time:
-                    bullets.add(Bullet(screen, player.x + 10, player.y + 23, direction='right', owner=player))
+                    bullets.add(Bullet(screen, player.x + 22, player.y + 23, direction='right', owner=player))
                     player.cur_shoot_time = 30
             if keys[276]:  # стрелять влево
                 player.direction = 'left'
@@ -132,6 +133,6 @@ while running:
 
         for i in players.values():
             i.change_velocity()
-    cl.tick(1000)
+        cl.tick(60)
 network.close_sock(sockIn)
 network.alive = False
