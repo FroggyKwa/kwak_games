@@ -1,0 +1,4 @@
+resources/music/game_music1.wav filter=lfs diff=lfs merge=lfs -text
+resources/music/game_music2.wav filter=lfs diff=lfs merge=lfs -text
+resources/music/game_music3.wav filter=lfs diff=lfs merge=lfs -text
+resources/music/game_music4.wav filter=lfs diff=lfs merge=lfs -text
