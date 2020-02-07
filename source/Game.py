@@ -462,12 +462,15 @@ class Game:
                                         pygame.time.set_timer(myEventType, 500)
                                         phr = 'Отключение.'
                                         while True:
-                                            for event in pygame.event.get():
-                                                if event.type == myEventType:
-                                                    if phr[-1:-3] != '...':
+                                            print(phr[-3:0])
+                                            for e in pygame.event.get():
+                                                if e.type == myEventType:
+                                                    print(phr[-3:0])
+                                                    if phr[-3:0] != '...':
                                                         phr = phr + '.'
                                                     else:
                                                         phr = 'Отключение.'
+                                            screen.fill((0, 0, 0))
                                             font = pygame.font.Font(None, int(WIDTH * 0.03125))
                                             text = font.render(phr, 0, self.magenta)
                                             text_x = int(text.get_width() // 2 + WIDTH // 2)
