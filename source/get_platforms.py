@@ -3,7 +3,8 @@ import pygame
 from source.instances import *
 
 
-def get_platforms_surface(name_of_map="../resources/maps/map.tmx"):
+def get_platforms_surface(number):
+    name_of_map = f"../resources/maps/map{number}.tmx"
     surface = pygame.Surface((1280, 800), pygame.SRCALPHA, 32)
     gameMap = pytmx.load_pygame(name_of_map)
     for layer in gameMap.visible_layers:
@@ -17,7 +18,8 @@ def get_platforms_surface(name_of_map="../resources/maps/map.tmx"):
     return surface.convert_alpha(surface)
 
 
-def get_platforms(screen, group, name_of_map="../resources/maps/map.tmx"):
+def get_platforms(screen, group, number):
+    name_of_map = f"../resources/maps/map{number}.tmx"
     surface = pygame.Surface((1280, 800), pygame.SRCALPHA, 32)
     gameMap = pytmx.load_pygame(name_of_map)
     for layer in gameMap.visible_layers:

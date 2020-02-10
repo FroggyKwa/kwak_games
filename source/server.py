@@ -4,10 +4,10 @@ from source import network
 from source.player import Player
 from socket import gethostname, gethostbyname
 from source.get_platforms import *
+from random import choice
 
 sockIn = network.connect_InSocket(address='0.0.0.0')
 running = True
-print('IP:\n' + gethostbyname(gethostname()) + ':5555')
 pygame.init()
 cl = pygame.time.Clock()
 size = WIDTH, HEIGHT = 1280, 800
@@ -17,7 +17,8 @@ clients = dict()
 players = dict()
 bullets = pygame.sprite.Group()
 platforms = pygame.sprite.Group()
-get_platforms(screen, platforms)
+number_of_map = choice([1, 2, 3, 4, 5])
+get_platforms(screen, platforms, number_of_map)
 messages = list()
 network.alive = True
 reader = Thread(target=network.socket_reader, args=(sockIn, messages))

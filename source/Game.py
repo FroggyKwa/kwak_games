@@ -11,6 +11,7 @@ from source import camera
 from source import button
 from source.get_platforms import *
 from source.player import Player
+from random import choice
 
 pygame.init()
 pygame.font.init()
@@ -94,7 +95,8 @@ class Game:
         network.alive = True
         self.t1 = Thread(target=network.socket_reader, args=(self.sockIn, self.messages))
         self.t1.start()
-        self.platforms = get_platforms_surface()
+        number = 1# todo: узнать с сервера какой номер карты
+        self.platforms = get_platforms_surface(number)
         self.player = Player(100, 100)
         self.enemies = pygame.sprite.Group()
 
