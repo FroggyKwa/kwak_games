@@ -22,6 +22,8 @@ messages = list()
 network.alive = True
 reader = Thread(target=network.socket_reader, args=(sockIn, messages))
 reader.start()
+players['111'] = Player(100, 100)
+players['222'] = Player(100, 100)
 while running:
     if not messages:
         continue
@@ -118,21 +120,22 @@ while running:
         except KeyError:
             pass
 
-        for p in players.values():
-            p.move(platforms)
+    for p in players.values():
+        p.move(platforms)
 
-        for i in bullets:
-            if time.time() - cur_time >= 0.001:
-                i.move()
-                for addr, player in players.items():
-                    if pygame.sprite.collide_mask(i, player) and i.owner != player:
-                        i.kill()
-                        player.get_damage(20)
-                        if player.hp < 0:
-                            players[addr] = Player(100, 100, socket=player.sock)
+    for i in bullets:
+        if time.time() - cur_time >= 0.001:
+            i.move()
+            for addr, player in players.items():
+                if pygame.sprite.collide_mask(i, player) and i.owner != player:
+                    i.kill()
+                    player.get_damage(20)
+                    if player.hp < 0:
+                        players[addr] = Player(100, 100, socket=player.sock)
 
-        for i in players.values():
-            i.change_velocity()
-        cl.tick(60)
+    for i in players.values():
+        i.change_velocity()
+
+    cl.tick(60)
 network.close_sock(sockIn)
 network.alive = False
