@@ -353,11 +353,33 @@ class Game:
             self.draw_buttons(self.buttons_game_pause)
         else:
             self.draw_buttons(self.buttons_game_not_pause)
+
+            players = {"lol": 1, "froggling": 5, "pr": 7, "l": 10} #todo: получить с сервера ники всех игроков
             font = pygame.font.Font(None, int(WIDTH * 0.03125))
-            text = font.render(f"Hp: {self.player.hp}/100", 0, self.magenta)
-            text_x = int(WIDTH * 0.01)
-            text_y = int(HEIGHT * 0.01)
+            min_x = 10000000
+            min_y = 10000000
+            max_w = 0
+            for i in range(4):
+                text = font.render(f"{list(players.keys())[i]}: {players[list(players.keys())[i]]}", 0, self.magenta)
+                text_x = int(WIDTH - text.get_width() * 1.1)
+                if min_x > text_x:
+                    min_x = text_x
+                text_y = int(HEIGHT * 0.02 + text.get_height() * 1.5 * i)
+                if min_y > text_x:
+                    min_y = text_y
+                if text.get_width() > max_w:
+                    max_w = text.get_width()
+                screen.blit(text, (text_x, text_y))
+            print(min_x, min_y, text.get_width(), text.get_height() * 8)
+            pygame.draw.rect(screen, self.magenta, (int(min_x - max_w * 0.1), int(min_y - text.get_height() * 0.25), int(max_w * 1.2), text.get_height() * 6), 3)
+            # clock, timer
+            time = ["10", "25"] # todo: написать получение с севера оставшегося времени
+            text = font.render(f"{time[0]}: {time[1]}", 0, self.magenta)
+            text_x = int(WIDTH * 0.02)
+            text_y = int(HEIGHT * 0.02)
             screen.blit(text, (text_x, text_y))
+            pygame.draw.rect(screen, self.magenta, (int(text_x * 0.6), int(text_y * 0.6), text.get_width() + int(text_x * 0.6), text.get_height() + int(text_y * 0.6)), 3)
+
 
     def draw_buttons(self, buttons):
         for i in buttons:
