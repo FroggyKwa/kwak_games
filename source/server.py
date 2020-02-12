@@ -40,7 +40,7 @@ while running:
             print(address, 'подключился')
             clients[address] = network.connect_OutSocket(address=address[0], port=5556)
             players[address] = Player(100, 100, socket=clients[address])
-            network.sock_send(clients[address], '1')
+            network.sock_send(clients[address], f'1{number_of_map}')
     elif data == '0':
         try:
             network.sock_send(clients[address], '0')

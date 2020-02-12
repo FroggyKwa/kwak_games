@@ -25,6 +25,7 @@ FPS = 120
 
 class Game:
     def __init__(self):
+        self.number_of_map = 0  # todo: узнать с сервера какой номер карты
         self.sound = sounds
         self.images = images
         self.background = self.get_infinite_background()
@@ -95,8 +96,6 @@ class Game:
         network.alive = True
         self.t1 = Thread(target=network.socket_reader, args=(self.sockIn, self.messages))
         self.t1.start()
-        number = 1# todo: узнать с сервера какой номер карты
-        self.platforms = get_platforms_surface(number)
         self.player = Player(100, 100)
         self.enemies = pygame.sprite.Group()
 
@@ -171,10 +170,15 @@ class Game:
                     self.msg_text = 'Сервер отключен! Проверьте соединение'
                     self.state = 1
                     return
-                if data == '1':
+                if data[0] == '1':
                     self.msg_text = 'Подключение прошло успешно!'
                     self.init_game()
+                    self.number_of_map = data[-1]
                     print(self.msg_text)
+                    self.number_of_map = data[-1]
+
+                    self.platforms = get_platforms_surface(self.number_of_map)
+
                     self.state = 3
                     self.sounds_is_on = True
                 elif data == '2':
