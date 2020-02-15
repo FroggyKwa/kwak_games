@@ -90,7 +90,7 @@ class Game:
         self.msg_text = str()
         self.ip = ''
         self.sockIn = network.connect_InSocket(address='0.0.0.0', port=5556)
-
+        self.tcp_SockIn = network.connect_tcpInSocket(port=4445)
 
     def init_game(self):
         network.alive = True
@@ -156,6 +156,7 @@ class Game:
         if event.key == 13:  # enter
             try:
                 self.sockOut = network.connect_OutSocket(address=self.ip.split(':')[0], port=int(self.ip.split(':')[1]))
+                self.tcp_sockOut = network.connect_tcpOutSocket(address=self.ip.split(':')[0])
             except network.socket.gaierror:
                 self.msg_text = 'Сервер отключен или не сущесвует'
             except (IndexError, ValueError):
@@ -163,9 +164,9 @@ class Game:
             else:
                 network.sock_send(self.sockOut, '1')
                 try:
-                    self.sockIn.settimeout(2)
-                    data, address = network.read_sock(self.sockIn)
-                    self.sockIn.settimeout(None)
+                    self.tcp_SockIn.settimeout(2)
+                    data, address = network.read_sock(self.tcp_SockIn)
+                    self.tcp_SockIn.settimeout(None)
                 except socket.timeout:
                     self.msg_text = 'Сервер отключен! Проверьте соединение'
                     self.state = 1
@@ -229,9 +230,11 @@ class Game:
                 network.alive = False
                 print('Произошла ошибка сервера! Повторите попытку подключения')
                 try:
-                    network.sock_send(self.sockOut, '0')
+                    network.sock_send(self.tcp_sockOut, '0')
                     network.close_sock(self.sockIn)
                     network.close_sock(self.sockOut)
+                    network.close_sock(self.tcp_sockOut)
+                    network.close_sock(self.tcp_SockIn)
                 except AttributeError:
                     pass
                 return
@@ -360,7 +363,7 @@ class Game:
         else:
             self.draw_buttons(self.buttons_game_not_pause)
 
-            players = {"lol": 1, "froggling": 5, "pr": 7, "l": 10} #todo: получить с сервера ники всех игроков
+            players = {"lol": 1, "froggling": 5, "pr": 7, "l": 10}  # todo: получить с сервера ники всех игроков
             font = pygame.font.Font(None, int(WIDTH * 0.03125))
             min_x = 10000000
             min_y = 10000000
@@ -377,15 +380,18 @@ class Game:
                     max_w = text.get_width()
                 screen.blit(text, (text_x, text_y))
             print(min_x, min_y, text.get_width(), text.get_height() * 8)
-            pygame.draw.rect(screen, self.magenta, (int(min_x - max_w * 0.1), int(min_y - text.get_height() * 0.25), int(max_w * 1.2), text.get_height() * 6), 3)
+            pygame.draw.rect(screen, self.magenta, (
+            int(min_x - max_w * 0.1), int(min_y - text.get_height() * 0.25), int(max_w * 1.2), text.get_height() * 6),
+                             3)
             # clock, timer
-            time = ["10", "25"] # todo: написать получение с севера оставшегося времени
+            time = ["10", "25"]  # todo: написать получение с севера оставшегося времени
             text = font.render(f"{time[0]}: {time[1]}", 0, self.magenta)
             text_x = int(WIDTH * 0.02)
             text_y = int(HEIGHT * 0.02)
             screen.blit(text, (text_x, text_y))
-            pygame.draw.rect(screen, self.magenta, (int(text_x * 0.6), int(text_y * 0.6), text.get_width() + int(text_x * 0.6), text.get_height() + int(text_y * 0.6)), 3)
-
+            pygame.draw.rect(screen, self.magenta, (
+            int(text_x * 0.6), int(text_y * 0.6), text.get_width() + int(text_x * 0.6),
+            text.get_height() + int(text_y * 0.6)), 3)
 
     def draw_buttons(self, buttons):
         for i in buttons:
@@ -470,7 +476,7 @@ class Game:
                     self.play_sound()
                 for event in pygame.event.get():
                     if self.check_exit_event(event):
-                        network.sock_send(self.sockOut, '0')
+                        network.sock_send(self.tcp_sockOut, '0')
                         break
                     if event.type == pygame.KEYDOWN:
                         keys = pygame.key.get_pressed()
@@ -485,7 +491,7 @@ class Game:
                                 if button.Button.check_cursor_release_button(i, x, y):
                                     name_button = button.Button.get_name(i)
                                     if name_button == "Return to menu":
-                                        network.sock_send(self.sockOut, '0')
+                                        network.sock_send(self.tcp_sockOut, '0')
                                         myEventType = 30
                                         pygame.time.set_timer(myEventType, 500)
                                         phr = 'Отключение.'
@@ -504,7 +510,7 @@ class Game:
                                             text_x = int(text.get_width() // 2 + WIDTH // 2)
                                             text_y = int(HEIGHT * 0.8 - text.get_height() // 2)
                                             screen.blit(text, (text_x, text_y))
-                                            network.sock_send(self.sockOut, '0')
+                                            network.sock_send(self.tcp_sockOut, '0')
                                             if self.messages and self.messages[0][0] == '0':
                                                 break
                                             pygame.display.flip()
@@ -541,7 +547,7 @@ class Game:
                         self.running = False
                         network.alive = False
                         try:
-                            network.sock_send(self.sockOut, '0')
+                            network.sock_send(self.tcp_sockOut, '0')
                             network.close_sock(self.sockIn)
                             network.close_sock(self.sockOut)
                         except AttributeError:
@@ -553,7 +559,7 @@ class Game:
                     continue
                 if self.player.hp <= 0:
                     self.state = 7
-                    network.sock_send(self.sockOut, '0')
+                    network.sock_send(self.tcp_sockOut, '0')
                     network.close_sock(self.sockOut)
                 self.draw()
             if self.state == 4:  # авторы
@@ -587,7 +593,7 @@ class Game:
             cl.tick(FPS)
         try:
             network.alive = False
-            network.sock_send(self.sockOut, '0')
+            network.sock_send(self.tcp_sockOut, '0')
             network.close_sock(self.sockIn)
             network.close_sock(self.sockOut)
             pygame.quit()

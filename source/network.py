@@ -10,8 +10,21 @@ def connect_InSocket(address='0.0.0.0', port=5555):
     return sock
 
 
+def connect_tcpInSocket(address='0.0.0.0', port=4444):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind((address, port))
+    return sock
+
+
 def connect_OutSocket(address='0.0.0.0', port=5555):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    sock.connect((address, port))
+    return sock
+
+
+def connect_tcpOutSocket(address='0.0.0.0', port=4444):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((address, port))
     return sock
 

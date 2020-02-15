@@ -2,11 +2,11 @@ import time
 from threading import Thread
 from source import network
 from source.player import Player
-from socket import gethostname, gethostbyname
 from source.get_platforms import *
 from random import choice
 
-sockIn = network.connect_InSocket(address='0.0.0.0')
+sockIn = network.connect_InSocket()
+sockTcpIn = network.connect_tcpInSocket()
 running = True
 pygame.init()
 cl = pygame.time.Clock()
@@ -20,20 +20,27 @@ platforms = pygame.sprite.Group()
 number_of_map = choice([1, 2, 3, 4, 5])
 get_platforms(screen, platforms, number_of_map)
 messages = list()
+service_messages = list()
 network.alive = True
-reader = Thread(target=network.socket_reader, args=(sockIn, messages))
-reader.start()
+udp_reader = Thread(target=network.socket_reader, args=(sockIn, messages))
+udp_reader.start()
+tcp_reader = Thread(target=network.socket_reader, args=(sockTcpIn, service_messages))
+tcp_reader.start()
 players['111'] = Player(100, 100)
-players['222'] = Player(100, 100)
+players['222'] = Player(500, 100)
 while running:
-    if not messages:
+    if not messages and not service_messages:
         continue
-    data, address = messages.pop()
+    if messages:
+        data, address = messages.pop()
+    if service_messages:
+        data, address = service_messages.pop()
     if data == '1':
         if address in clients.keys():
             network.sock_send(clients[address], '2')
         elif len(clients.values()) >= 4:
             sock = network.connect_OutSocket(address=address[0], port=5556)
+            tcp_sock = network.connect_tcpOutSocket(address=address[0], port=4445)
             network.sock_send(sock, '3')
             sock.close()
         else:
